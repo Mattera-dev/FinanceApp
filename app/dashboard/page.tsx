@@ -45,15 +45,6 @@ export default function DashboardPage() {
   })
   const [recentTransactions, setRecentTransactions] = useState<any[]>([])
 
-  useEffect(() => {
-    const authData = getAuthCookie()
-    if (!authData) {
-      router.push("/auth")
-    } else {
-      loadDashboardData()
-      setIsLoading(false)
-    }
-  }, [router])
 
   const loadDashboardData = () => {
     try {

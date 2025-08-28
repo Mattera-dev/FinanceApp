@@ -3,14 +3,15 @@
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { AuthForm } from "@/components/auth-form"
-import { getAuthCookie } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, TrendingUp } from "lucide-react"
+import { authStore } from "../stores/authStore"
 
 export default function AuthPage() {
   const [mode, setMode] = useState<"login" | "register">("login")
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { isLogged } = authStore()
 
   useEffect(() => {
     // Check URL params for mode
@@ -19,9 +20,7 @@ export default function AuthPage() {
       setMode("register")
     }
 
-    // Redirect if already authenticated
-    const authData = getAuthCookie()
-    if (authData) {
+    if (isLogged) {
       router.push("/dashboard")
     }
   }, [router, searchParams])
@@ -47,7 +46,7 @@ export default function AuthPage() {
           <p className="text-muted-foreground">Gerencie suas finanças pessoais</p>
         </div>
 
-                <div className="mb-6">
+        <div className="mb-6">
           <Button
             variant="ghost"
             onClick={() => router.push("/")}

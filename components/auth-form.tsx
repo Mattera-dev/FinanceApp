@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { storeUser, validateUser, setAuthCookie } from "@/lib/auth"
+import { authStore } from "@/app/stores/authStore"
 
 interface AuthFormProps {
   mode: "login" | "register"
@@ -22,9 +23,11 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
     email: "",
     password: "",
     confirmPassword: "",
+    phone: "", // NOVO: Adiciona o campo de telefone ao estado
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isLoading, setIsLoading] = useState(false)
+  const { login } = authStore()
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
@@ -48,6 +51,12 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
       if (formData.password !== formData.confirmPassword) {
         newErrors.confirmPassword = "Senhas não coincidem"
       }
+      // NOVO: Adiciona a validação para o campo de telefone
+      if (!formData.phone) {
+        newErrors.phone = "Telefone é obrigatório";
+      } else if (!/^\(?([0-9]{2})\)?([0-9]{4,5})-?([0-9]{4})$/.test(formData.phone)) {
+        newErrors.phone = "Telefone inválido";
+      }
     }
 
     setErrors(newErrors)
@@ -63,22 +72,27 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
 
     try {
       if (mode === "register") {
-        const newUser = storeUser({
+        const newUser = {
           name: formData.name,
           email: formData.email,
           password: formData.password,
-        })
-
-        const authData = {
-          user: {
-            id: newUser.id,
-            email: newUser.email,
-            name: newUser.name,
-          },
-          token: `token-${newUser.id}-${Date.now()}`,
+          phone: formData.phone,
         }
 
-        setAuthCookie(authData)
+        const res = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newUser),
+        }).then(async data => await data.json())
+
+        if (!res) setErrors({ general: "Ocorreu um erro! Tente novamente." })
+
+        const { name, id, email } = res as { name: string, id: string, email: string }
+
+        // login()
+
         setTimeout(() => {
           onSuccess()
         }, 100)
@@ -119,17 +133,32 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === "register" && (
-            <div className="space-y-2">
-              <Label htmlFor="name">Nome</Label>
-              <Input
-                id="name"
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-                className={errors.name ? "border-destructive" : ""}
-              />
-              {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
-            </div>
+            <>
+              {/* NOVO: Campo de Telefone */}
+              <div className="space-y-2">
+                <Label htmlFor="phone">Telefone</Label>
+                <Input
+                  id="phone"
+                  type="tel" // Use o tipo 'tel' para telefones
+                  value={formData.phone}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, phone: e.target.value }))}
+                  className={errors.phone ? "border-destructive" : ""}
+                />
+                {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="name">Nome</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                  className={errors.name ? "border-destructive" : ""}
+                />
+                {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+              </div>
+            </>
           )}
 
           <div className="space-y-2">

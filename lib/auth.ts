@@ -58,7 +58,7 @@ export function getStoredUsers(): Array<{ email: string; password: string; name:
   }
 }
 
-export function storeUser(user: { email: string; password: string; name: string }) {
+export function storeUser(user: { email: string; password: string; name: string, phone: string }) {
   const users = getStoredUsers()
   const newUser = {
     ...user,

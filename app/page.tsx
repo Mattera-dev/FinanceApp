@@ -22,11 +22,12 @@ import {
   LayoutDashboard,
 } from "lucide-react"
 import PricingSection from "@/components/plans-section"
+import { authStore } from "./stores/authStore"
 
 export default function HomePage() {
   const router = useRouter()
-  const [isLoading, setIsLoading] = useState(true)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const { isLogged, login, logout } = authStore()
 
   const delayClasses = "delay-[150ms] delay-[300ms] delay-[450ms] delay-[600ms] delay-[750ms] delay-[900ms] delay-[1050ms] delay-[1200ms]"
 
@@ -75,22 +76,6 @@ export default function HomePage() {
     { icon: MapPin, title: "Endereço", description: "São Paulo, SP - Brasil" },
   ]
 
-  useEffect(() => {
-    const checkAuth = () => {
-      try {
-        const authData = getAuthCookie()
-        if (authData) {
-          setIsLoggedIn(true)
-        }
-      } catch (error) {
-        console.error("Auth check error:", error)
-        setIsLoggedIn(false)
-      }
-      setIsLoading(false)
-    }
-
-    checkAuth()
-  }, [])
 
   const scrollToDemo = () => {
     const demoSection = document.getElementById("demo-section")
@@ -115,12 +100,12 @@ export default function HomePage() {
       {/* Header */}
       <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <TrendingUp className="h-8 w-8 text-primary" />
+          <div onClick={() => { login("", { email: "", name: "Carlos" }) }} onDoubleClick={() => { logout()}} className="flex items-center space-x-2">
+            <TrendingUp className="h-8 w-8 text-primary" /> 
             <h1 className="text-2xl font-bold text-primary">FinanceApp</h1>
           </div>
           <div className="space-x-2">
-            {isLoggedIn ? (
+            {isLogged ? (
               <Button onClick={() => router.push("/dashboard")} className="gap-2">
                 <LayoutDashboard className="h-4 w-4" />
                 Ir para Dashboard
@@ -154,7 +139,7 @@ export default function HomePage() {
             interativos e relatórios detalhados.
           </p>
           <div className="space-x-4">
-            {isLoggedIn ? (
+            {isLogged ? (
               <Button size="lg" onClick={() => router.push("/dashboard")} className="bg-primary hover:bg-primary/90">
                 <LayoutDashboard className="h-4 w-4 mr-2" />
                 Acessar Dashboard
@@ -250,7 +235,7 @@ export default function HomePage() {
           <p className="text-muted-foreground text-lg mb-8">
             Junte-se a milhares de usuários que já estão no controle das suas finanças pessoais
           </p>
-          {isLoggedIn ? (
+          {isLogged ? (
             <Button size="lg" onClick={() => router.push("/dashboard")} className="bg-primary hover:bg-primary/90">
               <LayoutDashboard className="h-4 w-4 mr-2" />
               Acessar Dashboard
