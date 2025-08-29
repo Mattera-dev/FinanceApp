@@ -14,7 +14,7 @@ import {
 } from "lucide-react"
 import { removeAuthCookie, getAuthCookie } from "@/lib/auth"
 import { useEffect, useState } from "react"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { authStore } from "@/app/stores/authStore"
 
 const navigationItems = [
@@ -45,11 +45,12 @@ export function Navigation({ onOpenWhatsApp, onOpenSettings }: NavigationProps) 
   const router = useRouter()
   const [userName, setUserName] = useState("")
   const [isOpen, setIsOpen] = useState(false)
-  const authData = authStore()
+  const { user, logout } = authStore()
 
   useEffect(() => {
-    setUserName(authData.user?.name ?? "<Erro>")
-  }, [])
+    console.log(user)
+    setUserName(user?.name ?? "<Erro>")
+  }, [user])
 
   const handleLogout = () => {
     fetch("/api/auth/logout", {
@@ -57,7 +58,7 @@ export function Navigation({ onOpenWhatsApp, onOpenSettings }: NavigationProps) 
     }).then((res) => {
 
       if (res.ok) {
-        authData.logout()
+        logout()
         router.push("/")
 
       } else {
@@ -151,6 +152,7 @@ export function Navigation({ onOpenWhatsApp, onOpenSettings }: NavigationProps) 
           </div>
 
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTitle about="sidebar" />
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
                 <MenuIcon className="h-6 w-6" />

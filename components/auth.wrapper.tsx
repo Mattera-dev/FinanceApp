@@ -18,16 +18,13 @@ export default function AuthWrapper({ children }: AuthWrapperProps) {
     const pathname = usePathname();
 
     useEffect(() => {
-        // Chama a verificação apenas uma vez na montagem
         checkAuth();
     }, [checkAuth]);
 
-    // Se a rota for de login, não precisa redirecionar
     const isAuthPath = unauthenticatedPaths.includes(pathname);
 
-    // Lida com o estado de carregamento e redirecionamento
     if (isLoading) {
-        return <LoadingPage message='Carregando dados do usuario...</div>' />;
+        return <LoadingPage message='Carregando dados do usuario...' />;
     }
 
     if (!isLogged && !isAuthPath && !isLogout) {

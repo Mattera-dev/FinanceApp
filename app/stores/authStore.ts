@@ -9,7 +9,8 @@ interface IAuthState {
     user: IUser | null,
     isLoading: boolean,
     isLogout: boolean,
-    login: (user: IUser) => void,
+    goal: number,
+    login: (user: IUser, goal?: number) => void,
     logout: () => void;
     checkAuth: () => Promise<void>
 }
@@ -21,10 +22,12 @@ export const authStore = create<IAuthState>()(
             user: null,
             isLoading: true,
             isLogout: false,
+            goal: 0,
 
-            login: (user: IUser) => set({
+            login: (user: IUser, goal?: number) => set({
 
                 user,
+                goal: goal ?? 2000,
                 isLogout: false,
                 isLogged: true
             }),

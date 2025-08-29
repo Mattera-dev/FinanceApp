@@ -28,7 +28,7 @@ export function LoadingSpinner({ size = "md", className }: LoadingSpinnerProps) 
 export function LoadingPage({ message = "Carregando..." }: { message?: string }) {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="text-center space-y-4">
+      <div className="text-center flex items-center justify-center flex-col gap-4 space-y-4">
         <LoadingSpinner size="lg" />
         <h1 className="text-2xl font-bold text-primary">{message}</h1>
       </div>

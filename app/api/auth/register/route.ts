@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
         id: newUser.id
     })
 
-    const res = NextResponse.json({ message: "User created", user: { name: newUser.name, id: newUser.id, email: newUser.email } }, { status: 201 })
+    const res = NextResponse.json({ message: "User created", user: { name: newUser.name, id: newUser.id, email: newUser.email, goal: newUser.goal } }, { status: 201 })
 
     res.cookies.set({
         name: 'auth_token',

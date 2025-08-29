@@ -1,5 +1,6 @@
 "use client"
 
+import { authStore } from "@/app/stores/authStore"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowUpIcon, ArrowDownIcon, DollarSignIcon, TrendingUpIcon } from "lucide-react"
 
@@ -19,6 +20,8 @@ export function SummaryCards({ data }: SummaryCardsProps) {
       currency: "BRL",
     }).format(value)
   }
+
+  const { goal } = authStore()
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -62,7 +65,7 @@ export function SummaryCards({ data }: SummaryCardsProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-green-700">{formatCurrency(data.savings)}</div>
-          <p className="text-xs text-muted-foreground">Meta: R$ 2.000,00</p>
+          <p className="text-xs text-muted-foreground">Meta: {formatCurrency(goal)}</p>
         </CardContent>
       </Card>
     </div>

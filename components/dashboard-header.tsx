@@ -1,24 +1,33 @@
 "use client"
 
+import { authStore } from "@/app/stores/authStore"
 import { Button } from "@/components/ui/button"
-import { removeAuthCookie, getAuthCookie } from "@/lib/auth"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 export function DashboardHeader() {
   const router = useRouter()
   const [userName, setUserName] = useState("")
+  const { user, logout } = authStore()
 
   useEffect(() => {
-    const authData = getAuthCookie()
-    if (authData) {
-      setUserName(authData.user.name)
-    }
+    setUserName(user?.name ?? "")
   }, [])
 
   const handleLogout = () => {
-    removeAuthCookie()
-    router.push("/auth")
+    fetch("/api/auth/logout", {
+      method: "POST",
+    }).then((res) => {
+
+      if (res.ok) {
+        logout()
+        router.push("/")
+
+      } else {
+        console.error("Ocorreu um erro ao fazer logout")
+      }
+
+    })
   }
 
   return (

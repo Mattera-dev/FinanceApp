@@ -45,9 +45,6 @@ export default function DashboardPage() {
     expenses: [] as number[],
   })
   const [recentTransactions, setRecentTransactions] = useState<any[]>([])
-  const { isLogged, checkAuth, user, isLoading } = authStore()
-
-
 
   const loadDashboardData = () => {
     try {
@@ -125,14 +122,6 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setIsWhatsAppModalOpen(true)}
-              className="gap-2 bg-green-50 hover:bg-green-100 text-green-700 border-green-200"
-            >
-              <MessageCircle className="h-4 w-4" />
-              Adicionar ao WhatsApp
-            </Button>
             <Button onClick={handleOpenModal} className="gap-2">
               <PlusIcon className="h-4 w-4" />
               Nova Transação
