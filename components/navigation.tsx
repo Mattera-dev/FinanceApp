@@ -29,8 +29,8 @@ const navigationItems = [
     icon: CreditCardIcon,
   },
   {
-    name: "Relatórios",
-    href: "/reports",
+    name: "Analisar investimentos",
+    href: "/invests",
     icon: BarChart3Icon,
   },
 ]
