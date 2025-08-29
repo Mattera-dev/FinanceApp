@@ -24,16 +24,6 @@ export default function TransactionsPage() {
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
   const [transactions, setTransactions] = useState<Transaction[]>([])
 
-  useEffect(() => {
-    const authData = getAuthCookie()
-    if (!authData) {
-      router.push("/auth")
-    } else {
-      loadTransactions()
-      setIsLoading(false)
-    }
-  }, [router])
-
   const loadTransactions = () => {
     const allTransactions = getTransactions()
     setTransactions(allTransactions)

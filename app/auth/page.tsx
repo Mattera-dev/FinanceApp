@@ -41,7 +41,7 @@ export default function AuthPage() {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <TrendingUp className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold text-primary">FinanceApp</h1>
+            <h1 className="text-3xl font-bold text-primary">ZenFinance</h1>
           </div>
           <p className="text-muted-foreground">Gerencie suas finanças pessoais</p>
         </div>

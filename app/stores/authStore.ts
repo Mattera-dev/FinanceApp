@@ -1,35 +1,59 @@
+import { IUser } from "@/types/user";
 import { create } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
 
 
-interface IUser { name: string, email: string }
 
 interface IAuthState {
     isLogged: boolean,
-    token: string | null,
     user: IUser | null,
-    login: (token: string, user: IUser) => void,
+    isLoading: boolean,
+    isLogout: boolean,
+    login: (user: IUser) => void,
     logout: () => void;
+    checkAuth: () => Promise<void>
 }
 
 export const authStore = create<IAuthState>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             isLogged: false,
-            token: null,
             user: null,
+            isLoading: true,
+            isLogout: false,
 
-            login: (token: string, user: IUser) => set({
-                token,
+            login: (user: IUser) => set({
+
                 user,
+                isLogout: false,
                 isLogged: true
             }),
 
             logout: () => set({
-                token: null,
                 user: null,
-                isLogged: false
-            })
+                isLogged: false,
+                isLogout: true
+            }),
+            checkAuth: async () => {
+                if (get().isLogged) {
+                    set({ isLoading: false })
+                    return
+                }
+
+                try {
+                    const res = await fetch('/api/auth/me');
+                    if (res.ok) {
+                        const { user } = await res.json() as { user: IUser };
+                        await set({ user: { name: user.name, email: user.email }, isLogged: true });
+                    } else {
+                        set({ user: null, isLogged: false });
+                    }
+                } catch (error) {
+                    console.error("Falha ao verificar autenticação:", error);
+                } finally {
+                    set({ isLoading: false });
+                }
+            }
         }),
         {
             name: "finance-auth",

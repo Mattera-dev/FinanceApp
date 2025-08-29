@@ -25,7 +25,7 @@ export function DashboardHeader() {
     <header className="bg-card border-b border-border px-6 py-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-primary">FinanceApp</h1>
+          <h1 className="text-2xl font-bold text-primary">ZenFinance</h1>
           <p className="text-sm text-muted-foreground">Olá, {userName}</p>
         </div>
         <Button variant="outline" onClick={handleLogout}>

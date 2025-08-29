@@ -8,8 +8,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { storeUser, validateUser, setAuthCookie } from "@/lib/auth"
 import { authStore } from "@/app/stores/authStore"
+import { Chrome, Facebook } from "lucide-react"
 
 interface AuthFormProps {
   mode: "login" | "register"
@@ -23,8 +23,9 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
     email: "",
     password: "",
     confirmPassword: "",
-    phone: "", // NOVO: Adiciona o campo de telefone ao estado
+    phone: "",
   })
+  const [formatedPhone, setFormatedPhone] = useState<string>("")
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isLoading, setIsLoading] = useState(false)
   const { login } = authStore()
@@ -51,7 +52,7 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
       if (formData.password !== formData.confirmPassword) {
         newErrors.confirmPassword = "Senhas não coincidem"
       }
-      // NOVO: Adiciona a validação para o campo de telefone
+
       if (!formData.phone) {
         newErrors.phone = "Telefone é obrigatório";
       } else if (!/^\(?([0-9]{2})\)?([0-9]{4,5})-?([0-9]{4})$/.test(formData.phone)) {
@@ -64,61 +65,87 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (!validateForm()) return
+    if (!validateForm()) return;
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
-      if (mode === "register") {
-        const newUser = {
+      const requestBody = mode === "register"
+        ? {
           name: formData.name,
           email: formData.email,
           password: formData.password,
           phone: formData.phone,
         }
+        : {
+          email: formData.email,
+          password: formData.password,
+        };
 
-        const res = await fetch("/api/auth/register", {
+      const res = await fetch(
+        mode === "register" ? "/api/auth/register" : "/api/auth/login",
+        {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(newUser),
-        }).then(async data => await data.json())
-
-        if (!res) setErrors({ general: "Ocorreu um erro! Tente novamente." })
-
-        const { name, id, email } = res as { name: string, id: string, email: string }
-
-        // login()
-
-        setTimeout(() => {
-          onSuccess()
-        }, 100)
-      } else {
-        const user = validateUser(formData.email, formData.password)
-
-        if (user) {
-          const authData = {
-            user,
-            token: `token-${user.id}-${Date.now()}`,
-          }
-
-          setAuthCookie(authData)
-          setTimeout(() => {
-            onSuccess()
-          }, 100)
-        } else {
-          setErrors({ general: "Email ou senha incorretos" })
+          body: JSON.stringify(requestBody),
         }
+      );
+
+      if (!res.ok) {
+        let errorMsg = ""
+        if (res.status == 401 || res.status == 404) {
+          errorMsg = "Email ou senha incorretos"
+        }
+        throw new Error(errorMsg || "Ocorreu um erro no servidor.");
       }
+      const data = await res.json();
+      const { user } = data;
+      login({ email: user.email, name: user.name });
+
+      setTimeout(() => {
+        onSuccess();
+      }, 100);
+
     } catch (error) {
-      setErrors({ general: "Erro interno. Tente novamente." })
+
+
+      if (error instanceof Error) {
+        setErrors({ general: error.message });
+      } else {
+        setErrors({ general: "Ocorreu um erro inesperado. Tente novamente." });
+      }
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
+
+  const formatPhone = (phone: string) => {
+    // 1. Limpa o telefone, mantendo apenas os dígitos
+    const cleaned = phone.replace(/\D/g, '');
+    let formatted = '';
+
+    // 2. Adiciona a formatação com base no tamanho
+    if (cleaned.length > 0) {
+      formatted = `(${cleaned.substring(0, 2)}`;
+    }
+    if (cleaned.length > 2) {
+      formatted += `) ${cleaned.substring(2, 7)}`;
+    }
+    if (cleaned.length > 7) {
+      // Para números de 9 dígitos
+      if (cleaned.length === 11) {
+        formatted = `(${cleaned.substring(0, 2)}) ${cleaned.substring(2, 7)}-${cleaned.substring(7, 11)}`;
+      } else {
+        formatted += `-${cleaned.substring(7, 11)}`;
+      }
+    }
+
+    return formatted;
+  };
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -134,19 +161,6 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === "register" && (
             <>
-              {/* NOVO: Campo de Telefone */}
-              <div className="space-y-2">
-                <Label htmlFor="phone">Telefone</Label>
-                <Input
-                  id="phone"
-                  type="tel" // Use o tipo 'tel' para telefones
-                  value={formData.phone}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, phone: e.target.value }))}
-                  className={errors.phone ? "border-destructive" : ""}
-                />
-                {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
-              </div>
-
               <div className="space-y-2">
                 <Label htmlFor="name">Nome</Label>
                 <Input
@@ -160,6 +174,30 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
               </div>
             </>
           )}
+
+          {mode === "register" && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="phone">Telefone</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={formatedPhone}
+                  onChange={(e) => {
+                    const rawValue = e.target.value;
+                    setFormatedPhone(formatPhone(rawValue));
+                    setFormData((prev) => ({ ...prev, phone: rawValue.replace(/\D/g, '') }));
+                  }}
+                  maxLength={15}
+                  className={`placeholder:text-slate-400 ${errors.phone ? "border-destructive" : ""}`}
+                  placeholder="(__) _____-____"
+                />
+
+                {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
+              </div>
+            </>
+          )}
+
 
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -208,6 +246,22 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Carregando..." : mode === "login" ? "Entrar" : "Criar Conta"}
           </Button>
+
+          {mode === "login" && (
+            <>
+              <div className="w-full flex gap-4 justify-between">
+                <Button type="button" variant={"destructive"} className="">
+                  <Chrome /> Entrar com o google
+                </Button>
+                <Button type="button" variant={"default"} className="">
+                  <Facebook /> Entrar com o facebook
+                </Button>
+
+              </div>
+            </>
+          )}
+
+
 
           <div className="text-center">
             <button type="button" onClick={onToggleMode} className="text-sm text-primary hover:underline">

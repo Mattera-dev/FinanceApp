@@ -3,6 +3,7 @@ import { IUserRegisterRequest } from "@/types/requests";
 import { NextRequest, NextResponse } from "next/server";
 import { hash } from "bcrypt"
 import { createJWT } from "@/lib/utils";
+import { authStore } from "@/app/stores/authStore";
 
 export async function POST(req: NextRequest) {
     const { name, email, phone, password } = await req.json() as IUserRegisterRequest
@@ -39,7 +40,6 @@ export async function POST(req: NextRequest) {
         maxAge: 60 * 60 * 24,
         path: '/',
     })
-
 
     return res
 

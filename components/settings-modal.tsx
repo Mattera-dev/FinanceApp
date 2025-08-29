@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator"
 import { SettingsIcon, UserIcon, BellIcon, ShieldIcon, LogOutIcon, Moon, Sun } from "lucide-react"
 import { clearAuthCookie } from "@/lib/auth"
 import { useRouter } from "next/navigation"
+import { authStore } from "@/app/stores/authStore"
 
 interface SettingsModalProps {
   isOpen: boolean
@@ -21,22 +22,8 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const [notifications, setNotifications] = useState(true)
   const [darkMode, setDarkMode] = useState(false)
   const [monthlyGoal, setMonthlyGoal] = useState("2000")
-  const [name, setName] = useState("Usuário")
-  const [email, setEmail] = useState("usuario@email.com")
+  const { user, logout } = authStore()
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const savedSettings = localStorage.getItem("finance-settings")
-      if (savedSettings) {
-        const settings = JSON.parse(savedSettings)
-        setNotifications(settings.notifications ?? true)
-        setDarkMode(settings.darkMode ?? false)
-        setMonthlyGoal(settings.monthlyGoal ?? "2000")
-        setName(settings.name ?? "Usuário")
-        setEmail(settings.email ?? "usuario@email.com")
-      }
-    }
-  }, [])
 
   const toggleDarkMode = (enabled: boolean) => {
     setDarkMode(enabled)
@@ -47,22 +34,22 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     }
   }
 
-  const handleSaveSettings = () => {
-    const settings = {
-      notifications,
-      darkMode,
-      monthlyGoal,
-      name,
-      email,
-    }
-    localStorage.setItem("finance-settings", JSON.stringify(settings))
-    onClose()
-  }
 
   const handleLogout = () => {
-    clearAuthCookie()
-    onClose()
-    router.push("/")
+    fetch("/api/auth/logout", {
+      method: "POST",
+    }).then((res) => {
+
+      if (res.ok) {
+        logout()
+        onClose()
+        router.push("/")
+
+      } else {
+        console.error("Ocorreu um erro ao fazer logout")
+      }
+
+    })
   }
 
   return (
@@ -86,11 +73,11 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="name">Nome</Label>
-                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
+                <Input id="name" value={user?.name ?? ""} disabled />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Input id="email" type="email" value={user?.email} disabled />
               </div>
             </div>
 
@@ -165,7 +152,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
             {/* Actions */}
             <div className="space-y-2">
-              <Button onClick={handleSaveSettings} className="w-full">
+              <Button onClick={() => { }} className="w-full">
                 Salvar Alterações
               </Button>
               <Button variant="destructive" onClick={handleLogout} className="w-full justify-start gap-2">

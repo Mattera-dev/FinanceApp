@@ -15,6 +15,7 @@ import {
 import { removeAuthCookie, getAuthCookie } from "@/lib/auth"
 import { useEffect, useState } from "react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { authStore } from "@/app/stores/authStore"
 
 const navigationItems = [
   {
@@ -44,23 +45,32 @@ export function Navigation({ onOpenWhatsApp, onOpenSettings }: NavigationProps) 
   const router = useRouter()
   const [userName, setUserName] = useState("")
   const [isOpen, setIsOpen] = useState(false)
+  const authData = authStore()
 
   useEffect(() => {
-    const authData = getAuthCookie()
-    if (authData) {
-      setUserName(authData.user.name)
-    }
+    setUserName(authData.user?.name ?? "<Erro>")
   }, [])
 
   const handleLogout = () => {
-    removeAuthCookie()
-    router.push("/auth")
+    fetch("/api/auth/logout", {
+      method: "POST",
+    }).then((res) => {
+
+      if (res.ok) {
+        authData.logout()
+        router.push("/")
+
+      } else {
+        console.error("Ocorreu um erro ao fazer logout")
+      }
+
+    })
   }
 
   const NavigationContent = () => (
     <div className="flex flex-col h-full">
       <div className="p-6 border-b border-border">
-        <h1 className="text-2xl font-bold text-primary">FinanceApp</h1>
+        <h1 className="text-2xl font-bold text-primary">ZenFinance</h1>
         <p className="text-sm text-muted-foreground">Olá, {userName}</p>
       </div>
 
@@ -136,7 +146,7 @@ export function Navigation({ onOpenWhatsApp, onOpenSettings }: NavigationProps) 
       <div className="lg:hidden">
         <div className="flex items-center justify-between p-4 bg-card border-b border-border">
           <div>
-            <h1 className="text-xl font-bold text-primary">FinanceApp</h1>
+            <h1 className="text-xl font-bold text-primary">ZenFinance</h1>
             <p className="text-xs text-muted-foreground">Olá, {userName}</p>
           </div>
 

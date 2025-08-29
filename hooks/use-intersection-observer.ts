@@ -12,17 +12,14 @@ export function useIntersectionObserver(options: UseIntersectionObserverOptions 
   const { threshold = 0.6, rootMargin = "0px", triggerOnce = true } = options
   const [isIntersecting, setIsIntersecting] = useState(false)
   const [hasTriggered, setHasTriggered] = useState(false)
-   const [element, setElement] = useState<HTMLDivElement | null>(null) // Usamos estado para o elemento
+  const [element, setElement] = useState<HTMLDivElement | null>(null) // Usamos estado para o elemento
 
   useEffect(() => {
-    console.log(element)
     if (!element) return
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         const isVisible = entry.isIntersecting
-
-        console.log("[v0] Element intersecting:", isVisible, "threshold:", entry.intersectionRatio)
 
         if (isVisible && (!triggerOnce || !hasTriggered)) {
           setIsIntersecting(true)
@@ -43,7 +40,7 @@ export function useIntersectionObserver(options: UseIntersectionObserverOptions 
     }
   }, [element, threshold, rootMargin, triggerOnce, hasTriggered])
 
-    const ref = useCallback((node: HTMLDivElement) => {
+  const ref = useCallback((node: HTMLDivElement) => {
     if (node) {
       setElement(node)
     }

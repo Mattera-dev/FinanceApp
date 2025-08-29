@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { getAuthCookie } from "@/lib/auth"
 import { DashboardPreview } from "@/components/dashboard-preview"
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer"
 import {
@@ -88,7 +87,7 @@ export default function HomePage() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-primary mb-4">FinanceApp</h1>
+          <h1 className="text-3xl font-bold text-primary mb-4">ZenFinance</h1>
           <p className="text-muted-foreground">Carregando...</p>
         </div>
       </div>
@@ -100,9 +99,9 @@ export default function HomePage() {
       {/* Header */}
       <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div onClick={() => { login("", { email: "", name: "Carlos" }) }} onDoubleClick={() => { logout()}} className="flex items-center space-x-2">
-            <TrendingUp className="h-8 w-8 text-primary" /> 
-            <h1 className="text-2xl font-bold text-primary">FinanceApp</h1>
+          <div onClick={() => { login({ email: "", name: "Carlos" }) }} onDoubleClick={() => { logout() }} className="flex items-center space-x-2">
+            <TrendingUp className="h-8 w-8 text-primary" />
+            <h1 className="text-2xl font-bold text-primary">ZenFinance</h1>
           </div>
           <div className="space-x-2">
             {isLogged ? (
@@ -283,9 +282,9 @@ export default function HomePage() {
         <div className="container mx-auto text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <TrendingUp className="h-6 w-6 text-primary" />
-            <span className="font-bold text-primary">FinanceApp</span>
+            <span className="font-bold text-primary">ZenFinance</span>
           </div>
-          <p className="text-muted-foreground">© 2025 FinanceApp. Todos os direitos reservados.</p>
+          <p className="text-muted-foreground">© 2025 ZenFinance. Todos os direitos reservados.</p>
         </div>
       </footer>
     </div>

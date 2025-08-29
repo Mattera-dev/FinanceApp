@@ -2,8 +2,10 @@
 import { NextResponse, NextRequest } from 'next/server';
 import jwt from 'jsonwebtoken';
 
+export const runtime = 'nodejs';
+
 // Suas URLs protegidas
-const PROTECTED_PATHS = ['/dashboard', '/transacoes', '/relatorios'];
+const PROTECTED_PATHS = ['/dashboard', '/transactions', '/reports'];
 
 // Sua chave secreta do JWT (deve ser a mesma usada no login)
 const JWT_SECRET = process.env.JWT_KEY || '';
@@ -13,16 +15,19 @@ export async function middleware(request: NextRequest) {
     if (PROTECTED_PATHS.some(path => pathname.startsWith(path))) {
 
         const token = request.cookies.get('auth_token')?.value;
-
         if (!token) {
+            console.log("nao tinha token volto pro auth")
             const loginUrl = new URL('/auth', request.url);
             return NextResponse.redirect(loginUrl);
         }
 
         try {
-            jwt.verify(token, JWT_SECRET);
+            const user = jwt.verify(token, JWT_SECRET);
+            
             return NextResponse.next();
         } catch (error) {
+            console.log("deu erro e volto pro auth " + error);
+            
             const loginUrl = new URL('/auth', request.url);
             return NextResponse.redirect(loginUrl);
         }

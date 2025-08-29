@@ -24,10 +24,11 @@ import {
   addTransaction,
 } from "@/lib/data-manager"
 import type { Transaction } from "@/lib/sample-data"
+import { authStore } from "../stores/authStore"
 
 export default function DashboardPage() {
   const router = useRouter()
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoadingData, setIsLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
@@ -44,6 +45,8 @@ export default function DashboardPage() {
     expenses: [] as number[],
   })
   const [recentTransactions, setRecentTransactions] = useState<any[]>([])
+  const { isLogged, checkAuth, user, isLoading } = authStore()
+
 
 
   const loadDashboardData = () => {
@@ -76,15 +79,13 @@ export default function DashboardPage() {
   }
 
   useEffect(() => {
-    const handleFocus = () => {
-      loadDashboardData()
-    }
-
-    window.addEventListener("focus", handleFocus)
-    return () => window.removeEventListener("focus", handleFocus)
+    loadDashboardData()
+    setIsLoading(false)
   }, [])
 
-  if (isLoading) {
+
+
+  if (isLoadingData) {
     return <LoadingPage message="Carregando dashboard..." />
   }
 

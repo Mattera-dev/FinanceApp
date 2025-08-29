@@ -15,16 +15,6 @@ export default function ReportsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [hasData, setHasData] = useState(false)
 
-  useEffect(() => {
-    const authData = getAuthCookie()
-    if (!authData) {
-      router.push("/auth")
-    } else {
-      const transactions = getTransactions()
-      setHasData(transactions.length > 0)
-      setIsLoading(false)
-    }
-  }, [router])
 
   if (isLoading) {
     return <LoadingPage message="Carregando relatórios..." />
