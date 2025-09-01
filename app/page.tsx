@@ -25,7 +25,6 @@ import { authStore } from "./stores/authStore"
 
 export default function HomePage() {
   const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
   const { isLogged, login, logout } = authStore()
 
   const delayClasses = "delay-[150ms] delay-[300ms] delay-[450ms] delay-[600ms] delay-[750ms] delay-[900ms] delay-[1050ms] delay-[1200ms]"
@@ -81,17 +80,6 @@ export default function HomePage() {
     if (demoSection) {
       demoSection.scrollIntoView({ behavior: "smooth" })
     }
-  }
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-primary mb-4">ZenFinance</h1>
-          <p className="text-muted-foreground">Carregando...</p>
-        </div>
-      </div>
-    )
   }
 
   return (

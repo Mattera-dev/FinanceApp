@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
-import { GeistSans } from 'geist/font/sans'
-import { GeistMono } from 'geist/font/mono'
 import './globals.css'
 import AuthWrapper from '@/components/auth.wrapper'
+import { Toaster } from 'sonner'
 
 export const metadata: Metadata = {
   title: 'ZenFinance',
@@ -17,10 +16,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
+      <body className={`font-sans`}>
         <AuthWrapper>
           {children}
         </AuthWrapper>
+        <Toaster />
       </body>
     </html>
   )

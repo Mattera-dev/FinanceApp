@@ -15,6 +15,7 @@ export interface ITransaction {
 export interface ICreateTransactionBody {
     title: string;
     amount: number;
+    category: string,
     type: TransactionType;
     date: Date;
 }
@@ -23,6 +24,7 @@ export interface IUpdateTransactionBody {
     id: string;
     title?: string;
     amount?: number;
+    category?: string,
     type?: TransactionType;
     date?: Date;
 }

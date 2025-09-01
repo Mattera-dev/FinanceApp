@@ -114,7 +114,7 @@ export async function createTransaction(
         });
 
         // 2. Atualiza o saldo do usuário
-        await tx.users.update({
+        const user = await tx.users.update({
             where: { id: userId },
             data: {
                 balance: {
@@ -123,7 +123,8 @@ export async function createTransaction(
             },
         });
 
-        return newTransaction;
+
+        return { transaction: newTransaction, balance: user.balance };
     });
 }
 
@@ -202,7 +203,7 @@ export async function updateTransaction(id: string, userId: string, updatedData:
         });
 
         // 4. Aplica o novo saldo
-        await tx.users.update({
+        const user = await tx.users.update({
             where: { id: userId },
             data: {
                 balance: {
@@ -211,6 +212,6 @@ export async function updateTransaction(id: string, userId: string, updatedData:
             },
         });
 
-        return updatedTransaction;
+        return { transaction: updatedTransaction, balance: user.balance };
     });
 }

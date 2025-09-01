@@ -251,7 +251,7 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
 
           {mode === "login" && (
             <>
-              <div className="w-full flex gap-4 justify-between">
+              <div className="w-full flex gap-4 flex-col md:flex-row justify-between">
                 <Button type="button" variant={"destructive"} className="">
                   <Chrome /> Entrar com o google
                 </Button>

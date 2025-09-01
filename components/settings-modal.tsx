@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -21,7 +21,6 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const router = useRouter()
   const [notifications, setNotifications] = useState(true)
   const [darkMode, setDarkMode] = useState(false)
-  const [monthlyGoal, setMonthlyGoal] = useState("2000")
   const { user, logout } = authStore()
 
 
@@ -60,6 +59,9 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             <SettingsIcon className="h-5 w-5" />
             Configurações
           </DialogTitle>
+          <DialogDescription >
+            Menu de configurações
+          </DialogDescription>
         </DialogHeader>
 
         <div className="grid md:grid-cols-2 gap-8">
@@ -107,11 +109,6 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   </div>
                 </div>
                 <Switch checked={darkMode} onCheckedChange={toggleDarkMode} />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="goal">Meta Mensal de Economia (R$)</Label>
-                <Input id="goal" type="number" value={monthlyGoal} onChange={(e) => setMonthlyGoal(e.target.value)} />
               </div>
             </div>
           </div>

@@ -117,6 +117,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     },
     // Ação para adicionar transação e atualizar o resumo
     addTransaction: async (newTransaction) => {
+        newTransaction.amount = newTransaction.amount * 100
         const res = await fetch('/api/transactions', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -126,10 +127,11 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
         if (res.ok) {
             const data = await res.json();
             const createdTransaction = data.transaction as ITransaction;
+            const newBalance = data.balance as number
 
             // Pega o estado atual das transações e adiciona a nova
             const updatedTransactions = [createdTransaction, ...get().transactions];
-            const summaryData = calculateSummaryData(updatedTransactions);
+            const summaryData = calculateSummaryData(updatedTransactions, newBalance);
 
             set({
                 transactions: updatedTransactions,
@@ -163,6 +165,10 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
 
     // Ação para atualizar transação e recalcular o resumo
     updateTransaction: async (id, updatedData) => {
+        if (updatedData.amount) {
+
+            updatedData.amount = updatedData.amount * 100
+        }
         try {
             const res = await fetch('/api/transactions', {
                 method: 'PUT',
@@ -176,11 +182,12 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
 
             const data = await res.json();
             const updatedTransaction = data.transaction as ITransaction;
+            const newBalance = data.balance as number;
 
             const updatedTransactions = get().transactions.map(t =>
                 t.id === id ? updatedTransaction : t
             );
-            const summaryData = calculateSummaryData(updatedTransactions);
+            const summaryData = calculateSummaryData(updatedTransactions, newBalance);
 
             set({
                 transactions: updatedTransactions,

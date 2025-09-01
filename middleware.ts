@@ -23,11 +23,11 @@ export async function middleware(request: NextRequest) {
 
         try {
             const user = jwt.verify(token, JWT_SECRET);
-            
+
             return NextResponse.next();
         } catch (error) {
             console.log("deu erro e volto pro auth " + error);
-            
+
             const loginUrl = new URL('/auth', request.url);
             return NextResponse.redirect(loginUrl);
         }
@@ -38,5 +38,5 @@ export async function middleware(request: NextRequest) {
 
 // Configuração do middleware para rodar em rotas que não são APIs ou arquivos estáticos
 export const config = {
-    matcher: ['/((?!api|_next/static|_next/image|favicon.ico|auth).*)'],
+    matcher: ['/((?!api|_next/static|_next/image|favicon.ico|auth|_not-found).*)'],
 };

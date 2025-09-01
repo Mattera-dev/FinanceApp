@@ -16,67 +16,36 @@ import { SettingsModal } from "@/components/settings-modal"
 import { Button } from "@/components/ui/button"
 import { PlusIcon, CreditCardIcon, HomeIcon, Settings } from "lucide-react"
 import { useTransactionsStore } from "../stores/transactionStore"
-import { ITransaction } from "@/types/transactions"
+import { ICreateTransactionBody } from "@/types/transactions"
+import { format } from "date-fns"
+import { ptBR } from "date-fns/locale"
 
 
 export default function DashboardPage() {
   const router = useRouter()
-  const [isLoadingData, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
-  const [trendData, setTrendData] = useState({
-    labels: [] as string[],
-    income: [] as number[],
-    expenses: [] as number[],
-  })
-  const [recentTransactions, setRecentTransactions] = useState<any[]>([])
 
-  const { hasExpense, fetchTransactions } = useTransactionsStore()
-
-  const loadDashboardData = () => {
-    try {
-      // const summary = calculateSummary()
-      // const expenses = getExpensesByCategory()
-      // const trends = getTrendData()
-      // const recent = getRecentTransactions(3)
-
-      // setSummaryData(summary)
-      // setExpenseData(expenses)
-      // setTrendData(trends)
-      // setRecentTransactions(recent)
-
-      // console.log("[v0] Dashboard data loaded:", { summary, expenses: expenses.length, trends, recent: recent.length })
-    } catch (error) {
-      console.error("[v0] Error loading dashboard data:", error)
-    }
-
-  }
+  const { transactions, hasExpense, fetchTransactions, addTransaction } = useTransactionsStore()
 
   useEffect(() => {
-    fetchTransactions()
+    fetchTransactions().then(() => setIsLoading(false))
   }, [fetchTransactions])
 
-  const handleTransactionSubmit = (transaction: ITransaction) => {
-    // addTransaction(transaction)
-    // loadDashboardData() // Refresh dashboard data
-    // setIsModalOpen(false)
+  const handleTransactionSubmit = async (transaction: ICreateTransactionBody) => {
+    try {
+      await addTransaction(transaction)
+      setIsModalOpen(false)
+    } catch (error) {
+      console.error("Error submitting transaction:", error)
+    }
   }
 
   const handleOpenModal = (e: React.MouseEvent) => {
     e.preventDefault()
     setIsModalOpen(true)
-  }
-
-  useEffect(() => {
-    loadDashboardData()
-    setIsLoading(false)
-  }, [])
-
-
-
-  if (isLoadingData) {
-    return <LoadingPage message="Carregando dashboard..." />
   }
 
   const formatCurrency = (value: number) => {
@@ -86,14 +55,13 @@ export default function DashboardPage() {
     }).format(value / 100)
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("pt-BR", {
-      day: "numeric",
-      month: "short",
-    })
-  }
+  const recentTransactions = transactions.slice(0, 7).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
-  const hasTransactions = recentTransactions.length > 0
+  const hasTransactions = transactions.length > 0
+
+  if (isLoading) {
+    return <LoadingPage message="Carregando dashboard..." />
+  }
 
   return (
     <PageLayout onOpenWhatsApp={() => setIsWhatsAppModalOpen(true)} onOpenSettings={() => setIsSettingsModalOpen(true)}>
@@ -137,7 +105,7 @@ export default function DashboardPage() {
               }}
             />
           )}
-          <TrendChart/>
+          <TrendChart />
         </div>
 
         {/* Recent Transactions Preview */}
@@ -156,9 +124,9 @@ export default function DashboardPage() {
                   className="flex items-center justify-between py-3 px-4 rounded-lg border border-border hover:bg-muted/50 transition-colors"
                 >
                   <div>
-                    <p className="font-medium">{transaction.description}</p>
+                    <p className="font-medium">{transaction.title}</p>
                     <p className="text-sm text-muted-foreground">
-                      {transaction.category} • {formatDate(transaction.date)}
+                      {transaction.category} • {format(transaction.date, "d 'de' MMMM 'de' yyyy", { locale: ptBR })}
                     </p>
                   </div>
                   <span className={`font-medium ${transaction.type === "income" ? "text-green-600" : "text-red-600"}`}>

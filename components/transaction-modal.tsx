@@ -1,161 +1,166 @@
-"use client"
+import React, { useEffect, useState } from "react";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { expenseCategories, incomeCategories, type Transaction } from "@/lib/sample-data"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { expenseCategories, incomeCategories } from "@/lib/sample-data";
+import {
+  ICreateTransactionBody, ITransaction
+} from "@/types/transactions";
 
 interface TransactionModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSubmit: (transaction: Omit<Transaction, "id">) => void
-  editingTransaction?: Transaction | null
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (data: ICreateTransactionBody, id?: string) => Promise<void>; // Updated to accept ID
+  initialData?: ITransaction | null; // Added initialData prop
 }
 
-export function TransactionModal({ isOpen, onClose, onSubmit, editingTransaction }: TransactionModalProps) {
+export function TransactionModal({ isOpen, onClose, onSubmit, initialData }: TransactionModalProps) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
   const [formData, setFormData] = useState({
-    type: "expense" as "income" | "expense",
+    type: "expense",
     amount: "",
     category: "",
     description: "",
-    date: new Date().toISOString().split("T")[0],
-  })
-  const [errors, setErrors] = useState<Record<string, string>>({})
-  const [isLoading, setIsLoading] = useState(false)
+    date: new Date(),
+  });
 
+  // Populate form with initialData when modal opens in edit mode
   useEffect(() => {
-    if (isOpen) {
-      if (editingTransaction) {
-        setFormData({
-          type: editingTransaction.type,
-          amount: editingTransaction.amount.toString(),
-          category: editingTransaction.category,
-          description: editingTransaction.description,
-          date: editingTransaction.date,
-        })
-      } else {
-        setFormData({
-          type: "expense",
-          amount: "",
-          category: "",
-          description: "",
-          date: new Date().toISOString().split("T")[0],
-        })
-      }
-      setErrors({})
-    }
-  }, [isOpen, editingTransaction])
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {}
-
-    if (!formData.type) {
-      newErrors.type = "Tipo é obrigatório"
-    }
-
-    if (!formData.amount) {
-      newErrors.amount = "Valor é obrigatório"
-    } else if (isNaN(Number(formData.amount)) || Number(formData.amount) <= 0) {
-      newErrors.amount = "Valor deve ser um número positivo"
-    }
-
-    if (!formData.category) {
-      newErrors.category = "Categoria é obrigatória"
-    }
-
-    if (!formData.description.trim()) {
-      newErrors.description = "Descrição é obrigatória"
-    }
-
-    if (!formData.date) {
-      newErrors.date = "Data é obrigatória"
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!validateForm()) return
-
-    setIsLoading(true)
-
-    try {
-      const transaction: Omit<Transaction, "id"> = {
-        type: formData.type,
-        amount: Number(formData.amount),
-        category: formData.category,
-        description: formData.description.trim(),
-        date: formData.date,
-      }
-
-      onSubmit(transaction)
-
+    if (isOpen && initialData) {
+      setFormData({
+        type: (initialData.type as "income" | "expense") || "expense",
+        amount: (initialData.amount / 100).toString(), // Convert back to BRL
+        category: initialData.category,
+        description: initialData.title,
+        date: new Date(initialData.date),
+      });
+    } else if (!isOpen) {
+      // Reset form when modal is closed
       setFormData({
         type: "expense",
         amount: "",
         category: "",
         description: "",
-        date: new Date().toISOString().split("T")[0],
-      })
-      setErrors({})
-      onClose()
-    } catch (error) {
-      setErrors({ general: "Erro ao salvar transação. Tente novamente." })
-    } finally {
-      setIsLoading(false)
+        date: new Date(),
+      });
+      setErrors({});
     }
-  }
+  }, [isOpen, initialData]);
 
-  const categories = formData.type === "expense" ? expenseCategories : incomeCategories
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.type) newErrors.type = "Tipo é obrigatório";
+    if (!formData.amount) newErrors.amount = "Valor é obrigatório";
+    else if (isNaN(Number(formData.amount)) || Number(formData.amount) <= 0) newErrors.amount = "Valor deve ser um número positivo";
+    if (!formData.category) newErrors.category = "Categoria é obrigatória";
+    if (!formData.description.trim()) newErrors.description = "Descrição é obrigatória";
+    if (!formData.date) newErrors.date = "Data é obrigatória";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+
+    try {
+      const transaction: ICreateTransactionBody = {
+        type: formData.type as "income" | "expense",
+        amount: Number(formData.amount),
+        category: formData.category,
+        title: formData.description.trim(),
+        date: formData.date,
+      };
+
+      await onSubmit(transaction, initialData?.id); // Pass ID if it exists
+
+    } catch (error) {
+      setErrors({ general: "Erro ao salvar transação. Tente novamente." });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleTypeChange = (type: "income" | "expense") => {
+    setFormData((prev) => ({ ...prev, type, category: "" }));
+  };
+
+  const categories = formData.type === "expense" ? expenseCategories : incomeCategories;
+  const isEditing = !!initialData;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{editingTransaction ? "Editar Transação" : "Nova Transação"}</DialogTitle>
+          <DialogTitle>{isEditing ? "Editar Transação" : "Nova Transação"}</DialogTitle>
           <DialogDescription>
-            {editingTransaction ? "Edite os dados da transação" : "Registre uma nova receita ou despesa"}
+            {isEditing 
+              ? "Modifique os detalhes da transação selecionada."
+              : "Preencha os detalhes para adicionar uma nova transação."
+            }
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Transaction Type */}
-          <div className="space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Transaction Type Buttons */}
+          <div className="space-y-2">
             <Label>Tipo de Transação</Label>
-            <RadioGroup
-              value={formData.type}
-              onValueChange={(value: "income" | "expense") => {
-                setFormData((prev) => ({ ...prev, type: value, category: "" }))
-              }}
-              className="flex gap-6"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="income" id="income" />
-                <Label htmlFor="income" className="font-medium text-green-700">
-                  Receita
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="expense" id="expense" />
-                <Label htmlFor="expense" className="text-destructive font-medium">
-                  Despesa
-                </Label>
-              </div>
-            </RadioGroup>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant={formData.type === "income" ? "default" : "outline"}
+                className="flex-1"
+                onClick={() => handleTypeChange("income")}
+              >
+                Receita
+              </Button>
+              <Button
+                type="button"
+                variant={formData.type === "expense" ? "destructive" : "outline"}
+                className="flex-1"
+                onClick={() => handleTypeChange("expense")}
+              >
+                Despesa
+              </Button>
+            </div>
             {errors.type && <p className="text-sm text-destructive">{errors.type}</p>}
           </div>
 
-          {/* Amount */}
+          {/* Amount Field */}
           <div className="space-y-2">
             <Label htmlFor="amount">Valor (R$)</Label>
             <Input
@@ -170,7 +175,7 @@ export function TransactionModal({ isOpen, onClose, onSubmit, editingTransaction
             {errors.amount && <p className="text-sm text-destructive">{errors.amount}</p>}
           </div>
 
-          {/* Category */}
+          {/* Category Select */}
           <div className="space-y-2">
             <Label htmlFor="category">Categoria</Label>
             <Select
@@ -191,29 +196,52 @@ export function TransactionModal({ isOpen, onClose, onSubmit, editingTransaction
             {errors.category && <p className="text-sm text-destructive">{errors.category}</p>}
           </div>
 
-          {/* Date */}
+          {/* Date Picker */}
           <div className="space-y-2">
-            <Label htmlFor="date">Data</Label>
-            <Input
-              id="date"
-              type="date"
-              value={formData.date}
-              onChange={(e) => setFormData((prev) => ({ ...prev, date: e.target.value }))}
-              className={errors.date ? "border-destructive" : ""}
-            />
+            <Label>Data</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className={cn(
+                    "w-full pl-3 text-left font-normal",
+                    !formData.date && "text-muted-foreground",
+                    errors.date && "border-destructive"
+                  )}
+                >
+                  {formData.date ? (
+                    format(formData.date, "PPP", { locale: ptBR })
+                  ) : (
+                    <span>Selecione uma data</span>
+                  )}
+                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={formData.date}
+                  onSelect={(date) => date && setFormData((prev) => ({ ...prev, date }))}
+                  disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+                  initialFocus
+                  className="p-3 pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
             {errors.date && <p className="text-sm text-destructive">{errors.date}</p>}
           </div>
 
-          {/* Description */}
+          {/* Description Field */}
           <div className="space-y-2">
             <Label htmlFor="description">Descrição</Label>
             <Textarea
               id="description"
               placeholder="Descreva a transação..."
+              rows={3}
               value={formData.description}
               onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
               className={errors.description ? "border-destructive" : ""}
-              rows={3}
             />
             {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
           </div>
@@ -224,16 +252,16 @@ export function TransactionModal({ isOpen, onClose, onSubmit, editingTransaction
             </Alert>
           )}
 
-          <div className="flex gap-4 pt-4">
-            <Button type="submit" disabled={isLoading} className="flex-1">
-              {isLoading ? "Salvando..." : editingTransaction ? "Atualizar Transação" : "Salvar Transação"}
-            </Button>
-            <Button type="button" variant="outline" onClick={onClose}>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
               Cancelar
             </Button>
-          </div>
+            <Button type="submit" variant="default" disabled={isLoading}>
+              {isLoading ? "Salvando..." : isEditing ? "Salvar Alterações" : "Salvar Transação"}
+            </Button>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

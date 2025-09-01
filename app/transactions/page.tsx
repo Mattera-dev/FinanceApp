@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { getAuthCookie } from "@/lib/auth"
 import { PageLayout } from "@/components/page-layout"
 import { LoadingPage } from "@/components/loading-spinner"
 import { TransactionList } from "@/components/transaction-list"
@@ -12,36 +11,37 @@ import { WhatsAppModal } from "@/components/whatsapp-modal"
 import { SettingsModal } from "@/components/settings-modal"
 import { Button } from "@/components/ui/button"
 import { PlusIcon, CreditCardIcon } from "lucide-react"
-import { getTransactions, addTransaction, updateTransaction } from "@/lib/data-manager"
-import type { Transaction } from "@/lib/sample-data"
+import { useTransactionsStore } from "@/app/stores/transactionStore"
+import type { ITransaction, ICreateTransactionBody, IUpdateTransactionBody } from "@/types/transactions"
 
 export default function TransactionsPage() {
   const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
+  const { transactions, fetchTransactions, loading, addTransaction, updateTransaction } = useTransactionsStore();
+
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
-  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
-  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [editingTransaction, setEditingTransaction] = useState<ITransaction | null>(null)
 
-  const loadTransactions = () => {
-    const allTransactions = getTransactions()
-    setTransactions(allTransactions)
-    console.log("[v0] Loaded transactions:", allTransactions.length)
-  }
+  useEffect(() => {
+    // Carrega as transações apenas uma vez ao montar o componente
+    fetchTransactions()
+  }, [fetchTransactions])
 
-  const handleTransactionSubmit = (transaction: Omit<Transaction, "id">) => {
-    if (editingTransaction) {
-      updateTransaction(editingTransaction.id, transaction)
-      setEditingTransaction(null)
+  const handleTransactionSubmit = async (
+    transactionData: ICreateTransactionBody,
+    id?: string
+  ) => {
+    if (id) {
+      const newData: IUpdateTransactionBody = { ...transactionData, id }
+      await updateTransaction(id, newData)
     } else {
-      addTransaction(transaction)
+      await addTransaction(transactionData)
     }
-    loadTransactions() // Refresh transactions list
-    setIsModalOpen(false)
+    handleModalClose()
   }
 
-  const handleEditTransaction = (transaction: Transaction) => {
+  const handleEditTransaction = (transaction: ITransaction) => {
     setEditingTransaction(transaction)
     setIsModalOpen(true)
   }
@@ -51,18 +51,7 @@ export default function TransactionsPage() {
     setEditingTransaction(null)
   }
 
-  useEffect(() => {
-    const handleFocus = () => {
-      loadTransactions()
-    }
 
-    window.addEventListener("focus", handleFocus)
-    return () => window.removeEventListener("focus", handleFocus)
-  }, [])
-
-  if (isLoading) {
-    return <LoadingPage message="Carregando transações..." />
-  }
 
   return (
     <PageLayout onOpenWhatsApp={() => setIsWhatsAppModalOpen(true)} onOpenSettings={() => setIsSettingsModalOpen(true)}>
@@ -80,7 +69,7 @@ export default function TransactionsPage() {
           </div>
 
           {transactions.length > 0 ? (
-            <TransactionList transactions={transactions} onEditTransaction={handleEditTransaction} />
+            <TransactionList onEditTransaction={handleEditTransaction} />
           ) : (
             <EmptyState
               icon={CreditCardIcon}
@@ -94,12 +83,12 @@ export default function TransactionsPage() {
           )}
         </div>
       </main>
-
+      
       <TransactionModal
         isOpen={isModalOpen}
         onClose={handleModalClose}
         onSubmit={handleTransactionSubmit}
-        editingTransaction={editingTransaction}
+        initialData={editingTransaction || undefined} // Pass the editing data here
       />
       <WhatsAppModal isOpen={isWhatsAppModalOpen} onClose={() => setIsWhatsAppModalOpen(false)} />
       <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} />
