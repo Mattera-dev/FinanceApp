@@ -7,24 +7,31 @@ import { Doughnut } from "react-chartjs-2"
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
-// Mapeamento de cores para as categorias
-const categoryColors: Record<string, string> = {
-  Moradia: "#3b82f6", // blue-500
-  Alimentação: "#ef4444", // red-500
-  Transporte: "#8b5cf6", // violet-500
-  Lazer: "#f97316", // orange-500
-  Saúde: "#10b981", // emerald-500
-  Outros: "#64748b", // slate-500
-}
+// Array fixo de cores para as categorias
+const fixedColors = [
+  "#3b82f6", // blue-500
+  "#ef4444", // red-500
+  "#8b5cf6", // violet-500
+  "#f97316", // orange-500
+  "#10b981", // emerald-500
+  "#64748b", // slate-500
+  "#eab308", // yellow-500
+  "#d946ef", // fuchsia-500
+  "#14b8a6", // teal-500
+  "#f43f5e", // rose-500
+]
 
-// Função para processar os dados da store para o gráfico
 const processChartData = (transactions: ITransaction[]) => {
-  // Filtra apenas as despesas
-  const expenses = transactions.filter(t => t.type === 'expense');
+  const today = new Date();
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
 
-  // Agrupa as despesas por categoria e soma os valores
-  const groupedExpenses = expenses.reduce((acc, current) => {
-    // Nota: Supondo que sua transação tenha um campo 'category'
+  const currentMonthExpenses = transactions.filter(t => {
+    const transactionDate = new Date(t.date);
+    return transactionDate.getMonth() === currentMonth && transactionDate.getFullYear() === currentYear && t.type === 'expense';
+  });
+
+  const groupedExpenses = currentMonthExpenses.reduce((acc, current) => {
     const category = current.category || 'Outros';
 
     if (!acc[category]) {
@@ -34,10 +41,9 @@ const processChartData = (transactions: ITransaction[]) => {
     return acc;
   }, {} as Record<string, number>);
 
-  // Extrai rótulos, valores e cores para o gráfico
   const labels = Object.keys(groupedExpenses);
   const dataPoints = labels.map(label => groupedExpenses[label]);
-  const colors = labels.map(label => categoryColors[label] || categoryColors.Outros);
+  const colors = labels.map((_, index) => fixedColors[index % fixedColors.length]);
 
   return {
     labels,
@@ -64,7 +70,6 @@ export function ExpenseChart() {
     );
   }
 
-  // Processa os dados da store para o gráfico
   const { labels, data, backgroundColor } = processChartData(transactions);
 
   const chartData = {
@@ -96,10 +101,10 @@ export function ExpenseChart() {
       tooltip: {
         callbacks: {
           label: (context: any) => {
-            const value = context.parsed / 100;
+            const value = context.parsed;
             const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
             const percentage = ((value / total) * 100).toFixed(1);
-            return `${context.label}: R$ ${value.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} (${percentage}%)`;
+            return `${context.label}: R$ ${(value / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })} (${percentage}%)`;
           },
         },
       },

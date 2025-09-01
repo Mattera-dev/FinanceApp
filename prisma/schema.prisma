@@ -25,18 +25,18 @@ model Users {
   email       String        @unique
   password    String
   phone       String
-  goal        Float         @default(2000)
+  goal        Float         @default(200000)
   balance     BigInt        @default(0)
   Transaction Transaction[]
 }
 
 model Transaction {
-  id     String          @id @default(auto()) @map("_id") @db.ObjectId
-  title  String
-  amount Int
-  type   TransactionType
-  category String 
-  date   DateTime        @default(now())
-  user   Users           @relation(fields: [userId], references: [id])
-  userId String          @db.ObjectId
+  id       String          @id @default(auto()) @map("_id") @db.ObjectId
+  title    String
+  amount   Int
+  type     TransactionType
+  category String
+  date     DateTime        @default(now())
+  user     Users           @relation(fields: [userId], references: [id])
+  userId   String          @db.ObjectId
 }

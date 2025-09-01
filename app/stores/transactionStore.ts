@@ -5,11 +5,22 @@ import { create } from 'zustand';
 
 // Função auxiliar para calcular o resumo.
 // É chamada em todas as ações que modificam as transações.
-const calculateSummaryData = (transactions: ITransaction[]) => {
+const calculateSummaryData = (transactions: ITransaction[], balance?: number) => {
     let monthlyIncome = 0;
     let monthlyExpenses = 0;
 
-    transactions.forEach(t => {
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+
+    // Filtra as transações para incluir apenas as do mês e ano atuais
+    const currentMonthTransactions = transactions.filter(t => {
+        const transactionDate = new Date(t.date);
+        return transactionDate.getMonth() === currentMonth && transactionDate.getFullYear() === currentYear;
+    });
+
+    // Agora, percorre apenas as transações filtradas
+    currentMonthTransactions.forEach(t => {
         if (t.type === 'income') {
             monthlyIncome += t.amount;
         } else {
@@ -17,8 +28,9 @@ const calculateSummaryData = (transactions: ITransaction[]) => {
         }
     });
 
-    const totalBalance = monthlyIncome - monthlyExpenses;
-    const savings = totalBalance > 0 ? totalBalance : 0;
+    const totalBalance = balance ?? 0;
+    console.log(`balance era ${balance} e total e ${totalBalance}`)
+    const savings = monthlyIncome - monthlyExpenses
 
     return {
         totalBalance,
@@ -66,7 +78,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
         set({ loading: true, error: null });
         try {
             console.log("start fetchTransactions")
-            const res = await fetch('/api/transactions?filter=monthly');
+            const res = await fetch('/api/transactions?filter=6-last-month');
             if (!res.ok) {
                 console.log("deu erro")
                 throw new Error('Falha ao buscar transações.');
@@ -75,9 +87,10 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
             const data = await res.json();
             console.log(data)
             const transactions = data.transactions.transactions as ITransaction[];
+            const balance = data.transactions.balance as number
 
             // Calcula o resumo dos dados recebidos
-            const summaryData = calculateSummaryData(transactions);
+            const summaryData = calculateSummaryData(transactions, balance);
             if (summaryData.monthlyExpenses != 0) {
                 set({ hasExpense: true })
             }

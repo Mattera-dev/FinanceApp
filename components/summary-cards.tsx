@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowUpIcon, ArrowDownIcon, DollarSignIcon, TrendingUpIcon } from "lucide-react"
 import { LoadingSpinner } from "./loading-spinner"
 import { useTransactionsStore } from "@/app/stores/transactionStore"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 
 interface SummaryCardsProps {
   totalBalance: number
@@ -24,11 +24,9 @@ export function SummaryCards() {
 
   const { summaryData, loading } = useTransactionsStore()
 
+
   const { goal } = authStore()
 
-  useEffect(() => {
-    console.log(summaryData)
-  }, [summaryData])
 
 
   return (

@@ -90,30 +90,6 @@ export async function getTransactionsLastSixMonths(userId: string): Promise<{ tr
     };
 }
 
-export async function updateTransaction(id: string, userId: string, updatedData: {
-    title?: string,
-    amount?: number,
-    type?: $Enums.TransactionType,
-    category?: string
-}) {
-    return await prisma.transaction.update({
-        where: {
-            id: id,
-            userId
-        },
-        data: updatedData
-    });
-}
-
-export async function deleteTransaction(id: string, userId: string) {
-    return await prisma.transaction.delete({
-        where: {
-            id: id,
-            userId
-        }
-    });
-}
-
 export async function createTransaction(
     title: string,
     amount: number,
@@ -122,14 +98,119 @@ export async function createTransaction(
     userId: string,
     category: string
 ) {
-    return await prisma.transaction.create({
-        data: {
-            title,
-            amount,
-            type,
-            userId,
-            category,
-            date,
-        },
+    // Usamos $transaction para garantir que ambas as operações sejam atômicas.
+    // Se uma falhar, a outra também será revertida.
+    return await prisma.$transaction(async (tx) => {
+        // 1. Cria a nova transação
+        const newTransaction = await tx.transaction.create({
+            data: {
+                title,
+                amount,
+                type,
+                userId,
+                category,
+                date,
+            },
+        });
+
+        // 2. Atualiza o saldo do usuário
+        await tx.users.update({
+            where: { id: userId },
+            data: {
+                balance: {
+                    [type === 'income' ? 'increment' : 'decrement']: amount
+                },
+            },
+        });
+
+        return newTransaction;
+    });
+}
+
+// ===================================
+// Função para DELETAR uma Transação
+// ===================================
+export async function deleteTransaction(id: string, userId: string) {
+    return await prisma.$transaction(async (tx) => {
+        // 1. Encontra a transação antes de deletar
+        const transactionToDelete = await tx.transaction.findUnique({
+            where: {
+                id: id,
+                userId: userId, // Garante que a transação pertence ao usuário
+            },
+        });
+
+        if (!transactionToDelete) {
+            throw new Error("Transaction not found or unauthorized");
+        }
+
+        // 2. Reverte a alteração no saldo do usuário
+        await tx.users.update({
+            where: { id: userId },
+            data: {
+                balance: {
+                    [transactionToDelete.type === 'income' ? 'decrement' : 'increment']: transactionToDelete.amount
+                },
+            },
+        });
+
+        // 3. Deleta a transação
+        const deletedTransaction = await tx.transaction.delete({
+            where: { id: transactionToDelete.id },
+        });
+
+        return deletedTransaction;
+    });
+}
+
+// ===================================
+// Função para ATUALIZAR uma Transação
+// ===================================
+export async function updateTransaction(id: string, userId: string, updatedData: {
+    title?: string,
+    amount?: number,
+    type?: $Enums.TransactionType,
+    category?: string
+}) {
+    return await prisma.$transaction(async (tx) => {
+        // 1. Encontra a transação original para reverter o saldo
+        const originalTransaction = await tx.transaction.findUnique({
+            where: {
+                id: id,
+                userId: userId,
+            },
+        });
+
+        if (!originalTransaction) {
+            throw new Error("Transaction not found or unauthorized");
+        }
+
+        // 2. Reverte o saldo da transação original
+        await tx.users.update({
+            where: { id: userId },
+            data: {
+                balance: {
+                    [originalTransaction.type === 'income' ? 'decrement' : 'increment']: originalTransaction.amount
+                },
+            },
+        });
+
+        // 3. Atualiza a transação com os novos dados
+        const updatedTransaction = await tx.transaction.update({
+            where: { id: id },
+            data: updatedData,
+        });
+
+        // 4. Aplica o novo saldo
+        await tx.users.update({
+            where: { id: userId },
+            data: {
+                balance: {
+                    [updatedTransaction.type === 'income' ? 'increment' : 'decrement']: updatedTransaction.amount
+                },
+            },
+        });
+
+        return updatedTransaction;
     });
 }

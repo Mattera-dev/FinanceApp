@@ -27,7 +27,7 @@ export const authStore = create<IAuthState>()(
             login: (user: IUser, goal?: number) => set({
 
                 user,
-                goal: goal ?? 2000,
+                goal: goal ?? 200000,
                 isLogout: false,
                 isLogged: true
             }),
