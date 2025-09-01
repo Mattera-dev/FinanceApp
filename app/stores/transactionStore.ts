@@ -3,12 +3,47 @@
 import { ICreateTransactionBody, ITransaction, IUpdateTransactionBody } from '@/types/transactions';
 import { create } from 'zustand';
 
+// Função auxiliar para calcular o resumo.
+// É chamada em todas as ações que modificam as transações.
+const calculateSummaryData = (transactions: ITransaction[]) => {
+    let monthlyIncome = 0;
+    let monthlyExpenses = 0;
+
+    transactions.forEach(t => {
+        if (t.type === 'income') {
+            monthlyIncome += t.amount;
+        } else {
+            monthlyExpenses += t.amount;
+        }
+    });
+
+    const totalBalance = monthlyIncome - monthlyExpenses;
+    const savings = totalBalance > 0 ? totalBalance : 0;
+
+    return {
+        totalBalance,
+        monthlyIncome,
+        monthlyExpenses,
+        savings,
+    };
+};
+
+interface SummaryData {
+    totalBalance: number
+    monthlyIncome: number
+    monthlyExpenses: number
+    savings: number
+}
+
 interface TransactionsState {
     transactions: ITransaction[];
+    summaryData: SummaryData,
     loading: boolean;
     error: string | null;
+    hasExpense: boolean;
 
     fetchTransactions: () => Promise<void>;
+    fetchLastSixMonthsTransactions: () => Promise<void>,
     addTransaction: (newTransaction: ICreateTransactionBody) => Promise<void>;
     updateTransaction: (id: string, updatedData: IUpdateTransactionBody) => Promise<void>;
     deleteTransaction: (id: string) => Promise<void>;
@@ -16,23 +51,58 @@ interface TransactionsState {
 
 export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     transactions: [],
-    loading: false,
+    loading: true,
+    hasExpense: false,
     error: null,
+    summaryData: {
+        monthlyExpenses: 0,
+        monthlyIncome: 0,
+        savings: 0,
+        totalBalance: 0
+    },
 
+    // Ação para buscar transações e calcular o resumo
     fetchTransactions: async () => {
         set({ loading: true, error: null });
         try {
-            const res = await fetch('/api/transactions');
+            console.log("start fetchTransactions")
+            const res = await fetch('/api/transactions?filter=monthly');
             if (!res.ok) {
+                console.log("deu erro")
                 throw new Error('Falha ao buscar transações.');
             }
+            console.log("Passou do res ok")
             const data = await res.json();
-            set({ transactions: data.transactions, loading: false });
+            console.log(data)
+            const transactions = data.transactions.transactions as ITransaction[];
+
+            // Calcula o resumo dos dados recebidos
+            const summaryData = calculateSummaryData(transactions);
+            if (summaryData.monthlyExpenses != 0) {
+                set({ hasExpense: true })
+            }
+            console.log("calculou o summary data")
+            console.log(summaryData)
+            // Seta as transações e o resumo em um único estado
+            set({ transactions, loading: false, summaryData });
         } catch (error) {
             set({ error: (error as Error).message, loading: false });
         }
     },
 
+    fetchLastSixMonthsTransactions: async () => {
+
+        set({ loading: true, error: null });
+        try {
+            const res = await fetch('/api/transactions?filter=6-last-month');
+            if (!res.ok) throw new Error('Falha ao buscar transações dos últimos 6 meses.');
+            const data = await res.json();
+            set({ transactions: data.transactions.transactions, loading: false });
+        } catch (error) {
+            set({ error: (error as Error).message, loading: false });
+        }
+    },
+    // Ação para adicionar transação e atualizar o resumo
     addTransaction: async (newTransaction) => {
         const res = await fetch('/api/transactions', {
             method: 'POST',
@@ -44,14 +114,20 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
             const data = await res.json();
             const createdTransaction = data.transaction as ITransaction;
 
-            set(state => ({
-                transactions: [createdTransaction, ...state.transactions],
-            }));
+            // Pega o estado atual das transações e adiciona a nova
+            const updatedTransactions = [createdTransaction, ...get().transactions];
+            const summaryData = calculateSummaryData(updatedTransactions);
+
+            set({
+                transactions: updatedTransactions,
+                summaryData,
+            });
         } else {
             set({ error: 'Falha ao adicionar transação.' });
         }
     },
 
+    // Ação para deletar transação e atualizar o resumo
     deleteTransaction: async (id) => {
         const res = await fetch('/api/transactions', {
             method: 'DELETE',
@@ -60,13 +136,19 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
         });
 
         if (res.ok) {
-            set(state => ({
-                transactions: state.transactions.filter(t => t.id !== id),
-            }));
+            const updatedTransactions = get().transactions.filter(t => t.id !== id);
+            const summaryData = calculateSummaryData(updatedTransactions);
+
+            set({
+                transactions: updatedTransactions,
+                summaryData,
+            });
         } else {
             set({ error: 'Falha ao apagar transação.' });
         }
     },
+
+    // Ação para atualizar transação e recalcular o resumo
     updateTransaction: async (id, updatedData) => {
         try {
             const res = await fetch('/api/transactions', {
@@ -82,12 +164,15 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
             const data = await res.json();
             const updatedTransaction = data.transaction as ITransaction;
 
-            // Atualiza a transação na lista do store
-            set(state => ({
-                transactions: state.transactions.map(t =>
-                    t.id === id ? updatedTransaction : t
-                ),
-            }));
+            const updatedTransactions = get().transactions.map(t =>
+                t.id === id ? updatedTransaction : t
+            );
+            const summaryData = calculateSummaryData(updatedTransactions);
+
+            set({
+                transactions: updatedTransactions,
+                summaryData,
+            });
 
         } catch (error) {
             set({ error: (error as Error).message });

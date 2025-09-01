@@ -35,6 +35,7 @@ model Transaction {
   title  String
   amount Int
   type   TransactionType
+  category String 
   date   DateTime        @default(now())
   user   Users           @relation(fields: [userId], references: [id])
   userId String          @db.ObjectId

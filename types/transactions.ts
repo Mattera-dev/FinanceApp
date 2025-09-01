@@ -9,6 +9,7 @@ export interface ITransaction {
     type: TransactionType;
     date: Date;
     userId: string;
+    category: string
 }
 
 export interface ICreateTransactionBody {

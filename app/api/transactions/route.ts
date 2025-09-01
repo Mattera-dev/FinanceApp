@@ -1,4 +1,4 @@
-import { createTransaction, deleteTransaction, getTransactionsById, updateTransaction } from "@/entities/transactions";
+import { createTransaction, deleteTransaction, getTransactionsById, getTransactionsByMonth, getTransactionsLastSixMonths, updateTransaction } from "@/entities/transactions";
 import { getDataFromToken } from "@/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -9,14 +9,28 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    const { searchParams } = new URL(req.url);
+    const filter = searchParams.get('filter'); // Ex: '?filter=monthly'
+
     try {
-        const transactions = await getTransactionsById(userData.id);
+        let transactions;
+
+        if (filter === 'monthly') {
+            // Busca apenas as transações do mês no banco de dados
+            transactions = await getTransactionsByMonth(userData.id);
+        } else if (filter === "6-last-month") {
+            transactions = await getTransactionsLastSixMonths(userData.id)
+        } else {
+            transactions = await getTransactionsById(userData.id);
+        }
 
         return NextResponse.json({ transactions }, { status: 200 });
+
     } catch (error) {
         return NextResponse.json({ message: "Failed to get transactions" }, { status: 500 });
     }
 }
+
 
 export async function POST(req: NextRequest) {
     const userData = await getDataFromToken(req);
@@ -26,13 +40,13 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-        const { title, amount, type, date } = await req.json();
+        const { title, amount, type, date, category } = await req.json();
 
-        if (!title || !amount || !type || !date) {
+        if (!title || !amount || !type || !date || !category) {
             return NextResponse.json({ message: "Bad Request" }, { status: 400 });
         }
 
-        const newTransaction = await createTransaction(title, amount, type, date, userData.id);
+        const newTransaction = await createTransaction(title, amount, type, date, userData.id, category);
 
         return NextResponse.json({ message: "Transaction created successfully", transaction: newTransaction }, { status: 201 });
     } catch (error) {

@@ -4,7 +4,6 @@ import type React from "react"
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { getAuthCookie } from "@/lib/auth"
 import { PageLayout } from "@/components/page-layout"
 import { LoadingPage } from "@/components/loading-spinner"
 import { SummaryCards } from "@/components/summary-cards"
@@ -15,16 +14,10 @@ import { TransactionModal } from "@/components/transaction-modal"
 import { WhatsAppModal } from "@/components/whatsapp-modal"
 import { SettingsModal } from "@/components/settings-modal"
 import { Button } from "@/components/ui/button"
-import { PlusIcon, CreditCardIcon, HomeIcon, MessageCircle, Settings } from "lucide-react"
-import {
-  calculateSummary,
-  getExpensesByCategory,
-  getTrendData,
-  getRecentTransactions,
-  addTransaction,
-} from "@/lib/data-manager"
-import type { Transaction } from "@/lib/sample-data"
-import { authStore } from "../stores/authStore"
+import { PlusIcon, CreditCardIcon, HomeIcon, Settings } from "lucide-react"
+import { useTransactionsStore } from "../stores/transactionStore"
+import { ITransaction } from "@/types/transactions"
+
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -32,13 +25,6 @@ export default function DashboardPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
-  const [summaryData, setSummaryData] = useState({
-    totalBalance: 0,
-    monthlyIncome: 0,
-    monthlyExpenses: 0,
-    savings: 0,
-  })
-  const [expenseData, setExpenseData] = useState<Array<{ category: string; amount: number; color: string }>>([])
   const [trendData, setTrendData] = useState({
     labels: [] as string[],
     income: [] as number[],
@@ -46,28 +32,35 @@ export default function DashboardPage() {
   })
   const [recentTransactions, setRecentTransactions] = useState<any[]>([])
 
+  const { hasExpense, fetchTransactions } = useTransactionsStore()
+
   const loadDashboardData = () => {
     try {
-      const summary = calculateSummary()
-      const expenses = getExpensesByCategory()
-      const trends = getTrendData()
-      const recent = getRecentTransactions(3)
+      // const summary = calculateSummary()
+      // const expenses = getExpensesByCategory()
+      // const trends = getTrendData()
+      // const recent = getRecentTransactions(3)
 
-      setSummaryData(summary)
-      setExpenseData(expenses)
-      setTrendData(trends)
-      setRecentTransactions(recent)
+      // setSummaryData(summary)
+      // setExpenseData(expenses)
+      // setTrendData(trends)
+      // setRecentTransactions(recent)
 
-      console.log("[v0] Dashboard data loaded:", { summary, expenses: expenses.length, trends, recent: recent.length })
+      // console.log("[v0] Dashboard data loaded:", { summary, expenses: expenses.length, trends, recent: recent.length })
     } catch (error) {
       console.error("[v0] Error loading dashboard data:", error)
     }
+
   }
 
-  const handleTransactionSubmit = (transaction: Omit<Transaction, "id">) => {
-    addTransaction(transaction)
-    loadDashboardData() // Refresh dashboard data
-    setIsModalOpen(false)
+  useEffect(() => {
+    fetchTransactions()
+  }, [fetchTransactions])
+
+  const handleTransactionSubmit = (transaction: ITransaction) => {
+    // addTransaction(transaction)
+    // loadDashboardData() // Refresh dashboard data
+    // setIsModalOpen(false)
   }
 
   const handleOpenModal = (e: React.MouseEvent) => {
@@ -90,7 +83,7 @@ export default function DashboardPage() {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
-    }).format(value)
+    }).format(value / 100)
   }
 
   const formatDate = (dateString: string) => {
@@ -106,7 +99,7 @@ export default function DashboardPage() {
     <PageLayout onOpenWhatsApp={() => setIsWhatsAppModalOpen(true)} onOpenSettings={() => setIsSettingsModalOpen(true)}>
       <main className="p-6 space-y-6">
         {/* Summary Cards */}
-        <SummaryCards data={summaryData} />
+        <SummaryCards />
 
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-3 justify-between items-center">
@@ -131,8 +124,8 @@ export default function DashboardPage() {
 
         {/* Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {expenseData.length > 0 ? (
-            <ExpenseChart data={expenseData} />
+          {hasExpense ? (
+            <ExpenseChart />
           ) : (
             <EmptyState
               icon={CreditCardIcon}
@@ -144,7 +137,7 @@ export default function DashboardPage() {
               }}
             />
           )}
-          <TrendChart data={trendData} />
+          <TrendChart/>
         </div>
 
         {/* Recent Transactions Preview */}
