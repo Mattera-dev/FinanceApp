@@ -6,6 +6,7 @@ import { AuthForm } from "@/components/auth-form"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, TrendingUp } from "lucide-react"
 import { authStore } from "../stores/authStore"
+import { toast } from "sonner"
 
 export default function AuthPage() {
   const [mode, setMode] = useState<"login" | "register">("login")
@@ -14,6 +15,10 @@ export default function AuthPage() {
   const { isLogged } = authStore()
 
   useEffect(() => {
+    const error = searchParams.get("error")
+    if (error == "failed") {
+      toast.error("Ocorreu um erro, tente novamente!")
+    }
     // Check URL params for mode
     const urlMode = searchParams.get("mode")
     if (urlMode === "register") {
