@@ -1,5 +1,5 @@
-
 import { ICreateTransactionBody, ITransaction, IUpdateTransactionBody } from '@/types/transactions';
+import { toast } from 'sonner';
 import { create } from 'zustand';
 
 const calculateSummaryData = (transactions: ITransaction[], balance?: number) => {
@@ -24,7 +24,7 @@ const calculateSummaryData = (transactions: ITransaction[], balance?: number) =>
     });
 
     const totalBalance = balance ?? 0;
-    const savings = monthlyIncome - monthlyExpenses
+    const savings = monthlyIncome - monthlyExpenses;
 
     return {
         totalBalance,
@@ -35,15 +35,15 @@ const calculateSummaryData = (transactions: ITransaction[], balance?: number) =>
 };
 
 interface SummaryData {
-    totalBalance: number
-    monthlyIncome: number
-    monthlyExpenses: number
-    savings: number
+    totalBalance: number;
+    monthlyIncome: number;
+    monthlyExpenses: number;
+    savings: number;
 }
 
 interface TransactionsState {
     transactions: ITransaction[];
-    summaryData: SummaryData,
+    summaryData: SummaryData;
     loading: boolean;
     error: string | null;
     hasExpense: boolean;
@@ -63,7 +63,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
         monthlyExpenses: 0,
         monthlyIncome: 0,
         savings: 0,
-        totalBalance: 0
+        totalBalance: 0,
     },
 
     fetchTransactions: async () => {
@@ -75,19 +75,20 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
             }
             const data = await res.json();
             const transactions = data.transactions.transactions as ITransaction[];
-            const balance = data.transactions.balance as number
+            const balance = data.transactions.balance as number;
 
             const summaryData = calculateSummaryData(transactions, balance);
-            if (summaryData.monthlyExpenses != 0) {
-                set({ hasExpense: true })
+            if (summaryData.monthlyExpenses !== 0) {
+                set({ hasExpense: true });
             }
             set({ transactions, loading: false, summaryData });
         } catch (error) {
             set({ error: (error as Error).message, loading: false });
         }
     },
+
     addTransaction: async (newTransaction) => {
-        newTransaction.amount = newTransaction.amount * 100
+        newTransaction.amount = newTransaction.amount * 100;
         const res = await fetch('/api/transactions', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -97,7 +98,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
         if (res.ok) {
             const data = await res.json();
             const createdTransaction = data.transaction as ITransaction;
-            const newBalance = data.balance as number
+            const newBalance = data.balance as number;
 
             const updatedTransactions = [createdTransaction, ...get().transactions];
             const summaryData = calculateSummaryData(updatedTransactions, newBalance);
@@ -106,8 +107,10 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
                 transactions: updatedTransactions,
                 summaryData,
             });
+            toast.success("Transação adicionada com sucesso!");
         } else {
             set({ error: 'Falha ao adicionar transação.' });
+            toast.error('Falha ao adicionar transação.');
         }
     },
 
@@ -120,23 +123,26 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
 
         if (res.ok) {
             const updatedTransactions = get().transactions.filter(t => t.id !== id);
-            const summaryData = calculateSummaryData(updatedTransactions);
+            const data = await res.json();
+            const summaryData = calculateSummaryData(updatedTransactions, data.balance);
 
             set({
                 transactions: updatedTransactions,
                 summaryData,
             });
+            toast.success("Excluído com sucesso!");
         } else {
             set({ error: 'Falha ao apagar transação.' });
+            toast.error('Falha ao apagar transação.');
         }
     },
 
     updateTransaction: async (id, updatedData) => {
-        if (updatedData.amount) {
-
-            updatedData.amount = updatedData.amount * 100
-        }
         try {
+            if (updatedData.amount) {
+                updatedData.amount = updatedData.amount * 100;
+            }
+
             const res = await fetch('/api/transactions', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -160,9 +166,10 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
                 transactions: updatedTransactions,
                 summaryData,
             });
-
+            toast.success("Transação atualizada com sucesso!");
         } catch (error) {
             set({ error: (error as Error).message });
+            toast.error((error as Error).message);
         }
-    }
+    },
 }));

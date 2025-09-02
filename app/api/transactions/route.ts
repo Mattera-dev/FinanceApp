@@ -75,7 +75,6 @@ export async function PUT(req: NextRequest) {
 
         return NextResponse.json({ message: "Transaction updated successfully", transaction: updatedTransaction.transaction, balance: Number(updatedTransaction.balance) }, { status: 200 });
     } catch (error) {
-        console.log(error)
         return NextResponse.json({ message: "Failed to update transaction" }, { status: 500 });
     }
 }
@@ -101,7 +100,7 @@ export async function DELETE(req: NextRequest) {
             return NextResponse.json({ message: "Transaction not found or unauthorized" }, { status: 404 });
         }
 
-        return NextResponse.json({ message: "Transaction deleted successfully" }, { status: 200 });
+        return NextResponse.json({ message: "Transaction deleted successfully", balance: deletedTransaction.balance }, { status: 200 });
     } catch (error) {
         return NextResponse.json({ message: "Failed to delete transaction" }, { status: 500 });
     }

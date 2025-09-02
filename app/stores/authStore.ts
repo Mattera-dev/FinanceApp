@@ -9,9 +9,11 @@ interface IAuthState {
     user: IUser | null,
     isLoading: boolean,
     isLogout: boolean,
+    checkedAuth: boolean,
     goal: number,
     login: (user: IUser, goal?: number) => void,
     logout: () => void;
+    resetLogout: () => void;
     checkAuth: () => Promise<void>
 }
 
@@ -21,6 +23,7 @@ export const authStore = create<IAuthState>()(
             isLogged: false,
             user: null,
             isLoading: true,
+            checkedAuth: false,
             isLogout: false,
             goal: 0,
 
@@ -35,16 +38,20 @@ export const authStore = create<IAuthState>()(
             logout: () => set({
                 user: null,
                 isLogged: false,
-                isLogout: true
+                isLogout: true,
+                checkedAuth: false,
             }),
+            resetLogout: () => set({ isLogout: false }),
             checkAuth: async () => {
                 if (get().isLogged) {
-                    set({ isLoading: false })
+                    set({ isLoading: false, checkedAuth: true })
                     return
                 }
 
                 try {
+                    set({ checkedAuth: false })
                     const res = await fetch('/api/auth/me');
+
                     if (res.ok) {
                         const { user } = await res.json() as { user: IUser };
                         await set({ user: { name: user.name, email: user.email }, isLogged: true });
@@ -54,7 +61,7 @@ export const authStore = create<IAuthState>()(
                 } catch (error) {
                     console.error("Falha ao verificar autenticação:", error);
                 } finally {
-                    set({ isLoading: false });
+                    set({ isLoading: false, checkedAuth: true });
                 }
             }
         }),

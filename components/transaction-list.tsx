@@ -1,12 +1,10 @@
-"use client"
-
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { SearchIcon, FilterIcon, ArrowUpIcon, ArrowDownIcon, EditIcon, DollarSign } from "lucide-react"
+import { SearchIcon, FilterIcon, ArrowUpIcon, ArrowDownIcon, EditIcon, DollarSign, Trash2 } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import type { ITransaction } from "@/types/transactions"
@@ -17,7 +15,7 @@ interface TransactionListProps {
 }
 
 export function TransactionList({ onEditTransaction }: TransactionListProps) {
-  const { transactions, summaryData: { totalBalance } } = useTransactionsStore();
+  const { transactions, summaryData: { totalBalance }, deleteTransaction } = useTransactionsStore();
 
   const [searchTerm, setSearchTerm] = useState("")
   const [filterType, setFilterType] = useState<"all" | "income" | "expense">("all")
@@ -28,6 +26,12 @@ export function TransactionList({ onEditTransaction }: TransactionListProps) {
       style: "currency",
       currency: "BRL",
     }).format(value / 100)
+  }
+
+  const onClickDelete = (id: string) => {
+    if (confirm("Voce realmente deseja excluir esta transacao?")) {
+      deleteTransaction(id)
+    }
   }
 
   const filteredTransactions = transactions.filter((transaction) => {
@@ -240,16 +244,26 @@ export function TransactionList({ onEditTransaction }: TransactionListProps) {
                                 {transaction.type === "income" ? "+" : "-"}
                                 {formatCurrency(transaction.amount)}
                               </p>
-                              {onEditTransaction && (
+                              <div className="flex gap-2">
+                                {onEditTransaction && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => onEditTransaction(transaction)}
+                                    className="h-8 w-8 p-0"
+                                  >
+                                    <EditIcon className="h-4 w-4" />
+                                  </Button>
+                                )}
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => onEditTransaction(transaction)}
-                                  className="h-8 w-8 p-0"
+                                  onClick={() => onClickDelete(transaction.id)}
+                                  className="h-8 w-8 p-0 text-red-500 hover:bg-red-700 dark:hover:bg-red-500"
                                 >
-                                  <EditIcon className="h-4 w-4" />
+                                  <Trash2 className="h-4 w-4" />
                                 </Button>
-                              )}
+                              </div>
                             </div>
                           </div>
                         </div>

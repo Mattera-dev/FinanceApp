@@ -146,7 +146,7 @@ export async function deleteTransaction(id: string, userId: string) {
         }
 
 
-        await tx.users.update({
+        const user = await tx.users.update({
             where: { id: userId },
             data: {
                 balance: {
@@ -160,7 +160,7 @@ export async function deleteTransaction(id: string, userId: string) {
             where: { id: transactionToDelete.id },
         });
 
-        return deletedTransaction;
+        return { transaction: deletedTransaction, balance: Number(user.balance) };
     });
 }
 
