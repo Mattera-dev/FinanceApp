@@ -87,9 +87,9 @@ export default function HomePage() {
       {/* Header */}
       <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div onClick={() => { login({ email: "", name: "Carlos" }) }} onDoubleClick={() => { logout() }} className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2">
             <TrendingUp className="h-8 w-8 text-primary" />
-            <h1 className="text-2xl font-bold text-primary">ZenFinance</h1>
+            <h1 className="text-xl md:text-2xl font-bold text-primary">ZenFinance</h1>
           </div>
           <div className="space-x-2">
             {isLogged ? (
@@ -102,7 +102,7 @@ export default function HomePage() {
                 <Button variant="outline" onClick={() => router.push("/auth")}>
                   Entrar
                 </Button>
-                <Button onClick={() => router.push("/auth")}>Começar Grátis</Button>
+                <Button onClick={() => router.push("/auth?mode=register")}>Começar Grátis</Button>
               </>
             )}
           </div>
@@ -118,14 +118,14 @@ export default function HomePage() {
           <Badge variant="secondary" className="mb-4 bg-primary/10 text-primary border-primary/20">
             Controle Total das Suas Finanças
           </Badge>
-          <h2 className="text-4xl md:text-6xl font-bold mb-6 text-balance">
+          <h2 className="text-3xl md:text-6xl font-bold mb-6 text-balance">
             Gerencie suas finanças com <span className="text-primary">inteligência</span>
           </h2>
           <p className="text-xl text-muted-foreground mb-8 text-pretty max-w-2xl mx-auto">
             Uma plataforma completa para controlar receitas, despesas e visualizar seus dados financeiros com gráficos
             interativos e relatórios detalhados.
           </p>
-          <div className="space-x-4">
+          <div className="space-x-2 flex items-center justify-center">
             {isLogged ? (
               <Button size="lg" onClick={() => router.push("/dashboard")} className="bg-primary hover:bg-primary/90">
                 <LayoutDashboard className="h-4 w-4 mr-2" />
@@ -192,7 +192,7 @@ export default function HomePage() {
       <section id="demo-section" className="py-20 px-4 bg-muted/30">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
-            <h3 className="text-3xl font-bold mb-4">Veja Como Funciona</h3>
+            <h3 className="text-2xl font-bold mb-4">Veja Como Funciona</h3>
             <p className="text-muted-foreground text-lg">
               Uma prévia da sua dashboard financeira com dados em tempo real
             </p>

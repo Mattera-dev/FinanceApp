@@ -153,7 +153,7 @@ export function TransactionList({ onEditTransaction }: TransactionListProps) {
                   placeholder="Buscar por descrição ou categoria..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 w-full"
                 />
               </div>
             </div>
@@ -161,7 +161,7 @@ export function TransactionList({ onEditTransaction }: TransactionListProps) {
             <div className="space-y-2">
               <label className="text-sm font-medium">Tipo</label>
               <Select value={filterType} onValueChange={(value: "all" | "income" | "expense") => setFilterType(value)}>
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -175,7 +175,7 @@ export function TransactionList({ onEditTransaction }: TransactionListProps) {
             <div className="space-y-2">
               <label className="text-sm font-medium">Categoria</label>
               <Select value={filterCategory} onValueChange={setFilterCategory}>
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -213,9 +213,9 @@ export function TransactionList({ onEditTransaction }: TransactionListProps) {
                       .map((transaction) => (
                         <div
                           key={transaction.id}
-                          className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
+                          className="flex flex-row sm:flex-row sm:items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
                         >
-                          <div className="flex items-center gap-4">
+                          <div className="flex-grow flex items-center gap-2 mb-0">
                             <div
                               className={`p-2 rounded-full ${transaction.type === "income"
                                 ? "bg-green-100 dark:bg-green-900/20"
@@ -229,35 +229,35 @@ export function TransactionList({ onEditTransaction }: TransactionListProps) {
                               )}
                             </div>
                             <div>
-                              <p className="font-medium">{transaction.title}</p>
+                              <p className="font-medium text-sm">{transaction.title}</p>
                               <div className="flex items-center gap-2 mt-1">
                                 <Badge variant="secondary" className="text-xs">
                                   {transaction.category}
                                 </Badge>
-                                <span className="text-sm text-muted-foreground">{(transaction.date.toString())}</span>
+                                <span className="text-sm text-muted-foreground">{format(transaction.date, "dd/MM/yyyy", { locale: ptBR })}</span>
                               </div>
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
                             <div className="text-right">
                               <p
-                                className={`text-lg font-bold ${transaction.type === "income" ? "text-green-600" : "text-red-600"
+                                className={`text-sm md:text-xl font-bold ${transaction.type === "income" ? "text-green-600" : "text-red-600"
                                   }`}
                               >
                                 {transaction.type === "income" ? "+" : "-"}
                                 {formatCurrency(transaction.amount)}
                               </p>
+                              {onEditTransaction && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => onEditTransaction(transaction)}
+                                  className="h-8 w-8 p-0"
+                                >
+                                  <EditIcon className="h-4 w-4" />
+                                </Button>
+                              )}
                             </div>
-                            {onEditTransaction && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => onEditTransaction(transaction)}
-                                className="h-8 w-8 p-0"
-                              >
-                                <EditIcon className="h-4 w-4" />
-                              </Button>
-                            )}
                           </div>
                         </div>
                       ))}

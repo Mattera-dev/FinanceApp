@@ -51,24 +51,24 @@ export default function TransactionsPage() {
     setEditingTransaction(null)
   }
 
-
-
   return (
     <PageLayout onOpenWhatsApp={() => setIsWhatsAppModalOpen(true)} onOpenSettings={() => setIsSettingsModalOpen(true)}>
-      <main className="p-6">
+      <main className="p-4 md:p-6">
         <div className="max-w-6xl mx-auto space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-0">
             <div>
               <h1 className="text-3xl font-bold text-primary">Transações</h1>
               <p className="text-muted-foreground">Gerencie todas as suas receitas e despesas</p>
             </div>
-            <Button onClick={() => setIsModalOpen(true)} className="gap-2">
+            <Button onClick={() => setIsModalOpen(true)} className="gap-2 w-full md:w-auto">
               <PlusIcon className="h-4 w-4" />
               Nova Transação
             </Button>
           </div>
 
-          {transactions.length > 0 ? (
+          {loading ? (
+            <LoadingPage message="Carregando transações..." />
+          ) : transactions.length > 0 ? (
             <TransactionList onEditTransaction={handleEditTransaction} />
           ) : (
             <EmptyState

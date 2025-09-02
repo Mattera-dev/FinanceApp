@@ -70,25 +70,26 @@ export default function DashboardPage() {
         <SummaryCards />
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap gap-3 justify-between items-center">
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => router.push("/")} className="gap-2">
+        <div className="flex flex-col md:flex-row md:justify-between items-center gap-3">
+          <div className="flex gap-2 w-full md:w-auto">
+            <Button variant="outline" onClick={() => router.push("/")} className="gap-2 w-full md:w-auto">
               <HomeIcon className="h-4 w-4" />
               Página Inicial
             </Button>
-            <Button variant="outline" onClick={() => setIsSettingsModalOpen(true)} className="gap-2">
+            <Button variant="outline" onClick={() => setIsSettingsModalOpen(true)} className="gap-2 hidden md:flex">
               <Settings className="h-4 w-4" />
               Configurações
             </Button>
           </div>
 
-          <div className="flex gap-2">
-            <Button onClick={handleOpenModal} className="gap-2">
+          <div className="flex w-full md:w-auto">
+            <Button onClick={handleOpenModal} className="gap-2 w-full md:w-auto">
               <PlusIcon className="h-4 w-4" />
               Nova Transação
             </Button>
           </div>
         </div>
+
 
         {/* Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -125,8 +126,8 @@ export default function DashboardPage() {
                 >
                   <div>
                     <p className="font-medium">{transaction.title}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {transaction.category} • {format(transaction.date, "d 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                    <p className="text-sm text-muted-foreground flex md:gap-2 flex-col md:flex-row">
+                      <span>{transaction.category}</span> <span className="hidden md:block">•</span> <span> {format(transaction.date, "d 'de' MMMM 'de' yyyy", { locale: ptBR })}</span>
                     </p>
                   </div>
                   <span className={`font-medium ${transaction.type === "income" ? "text-green-600" : "text-red-600"}`}>

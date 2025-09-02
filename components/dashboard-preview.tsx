@@ -27,7 +27,7 @@ export function DashboardPreview() {
   const expensesBalance = useIntersectionObserver()
   const transactions = useIntersectionObserver()
 
-  const transactionListObservers = mockData.expensesByCategory.map(() => useIntersectionObserver({ threshold: 0.3}))
+  const transactionListObservers = mockData.expensesByCategory.map(() => useIntersectionObserver({ threshold: 0.3 }))
 
   const classNames = "delay-[1200ms] delay-[1300ms] delay-[1400ms] delay-[1100ms]"
 
@@ -35,9 +35,9 @@ export function DashboardPreview() {
     <div className="relative">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 backdrop-blur-sm rounded-lg" />
 
-      <div className="relative p-6 space-y-6">
+      <div className="relative p-2 md:p-6 space-y-6">
         {/* Summary Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
           <Card ref={totalBalance.ref} className={`bg-background/80 backdrop-blur-sm border-primary/20 delay-[500ms] transition-all duration-200
                   ${totalBalance.isIntersecting ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-12"}`}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -96,26 +96,27 @@ export function DashboardPreview() {
           <CardContent>
             <div className="space-y-4">
               {mockData.expensesByCategory.map((item, index) => {
-                
-                const {ref, isIntersecting} = transactionListObservers[index]
+
+                const { ref, isIntersecting } = transactionListObservers[index]
 
                 return (
-                <div ref={ref} key={index} className={`flex items-center justify-between transition-all duration-200 delay-[${1000 + ((index+1) * 100)}ms] ${isIntersecting ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-12"}`}>
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-3 h-3 rounded-full bg-primary"
-                      style={{
-                        backgroundColor: `hsl(${index * 90}, 70%, 50%)`,
-                      }}
-                    />
-                    <span className="font-medium">{item.category}</span>
+                  <div ref={ref} key={index} className={`flex items-center gap-x-2 justify-between transition-all duration-200 delay-[${1000 + ((index + 1) * 100)}ms] ${isIntersecting ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-12"}`}>
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-primary"
+                        style={{
+                          backgroundColor: `hsl(${index * 90}, 70%, 50%)`,
+                        }}
+                      />
+                      <span className="font-medium text-sm">{item.category}</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-3">
+                      <Badge variant="secondary" className="w-10">{item.percentage}%</Badge>
+                      <span className="font-semibold text-xs w-14">R$ {item.amount.toLocaleString("pt-BR")}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary">{item.percentage}%</Badge>
-                    <span className="font-semibold">R$ {item.amount.toLocaleString("pt-BR")}</span>
-                  </div>
-                </div>
-              )})}
+                )
+              })}
             </div>
           </CardContent>
         </Card>
