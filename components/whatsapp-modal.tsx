@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { MessageCircleIcon, CheckCircleIcon } from "lucide-react"
+import { DialogDescription } from "@radix-ui/react-dialog"
 
 interface WhatsAppModalProps {
   isOpen: boolean
@@ -25,7 +26,6 @@ export function WhatsAppModal({ isOpen, onClose }: WhatsAppModalProps) {
     if (!phone.trim()) return
 
     setIsLoading(true)
-    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1500))
     setIsLoading(false)
     setStep("otp")
@@ -36,17 +36,14 @@ export function WhatsAppModal({ isOpen, onClose }: WhatsAppModalProps) {
     if (!otp.trim()) return
 
     setIsLoading(true)
-    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 2000))
     setIsLoading(false)
 
-    // Success - close modal and reset
     setStep("phone")
     setPhone("")
     setOtp("")
     onClose()
 
-    // Show success message (you could add a toast here)
     alert("WhatsApp conectado com sucesso!")
   }
 
@@ -65,6 +62,9 @@ export function WhatsAppModal({ isOpen, onClose }: WhatsAppModalProps) {
             <MessageCircleIcon className="h-5 w-5 text-green-600" />
             Conectar WhatsApp
           </DialogTitle>
+          <DialogDescription>
+            Menu para conexao ao whatsapp
+          </DialogDescription>
         </DialogHeader>
 
         {step === "phone" ? (

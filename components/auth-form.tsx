@@ -104,8 +104,6 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
       }
       const data = await res.json();
       const { user } = data;
-      console.log("esse vai ser o user da api")
-      console.log(user)
       login({ email: user.email, name: user.name }, user.goal);
 
       setTimeout(() => {
@@ -126,11 +124,9 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
   };
 
   const formatPhone = (phone: string) => {
-    // 1. Limpa o telefone, mantendo apenas os dígitos
     const cleaned = phone.replace(/\D/g, '');
     let formatted = '';
 
-    // 2. Adiciona a formatação com base no tamanho
     if (cleaned.length > 0) {
       formatted = `(${cleaned.substring(0, 2)}`;
     }
@@ -138,7 +134,6 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
       formatted += `) ${cleaned.substring(2, 7)}`;
     }
     if (cleaned.length > 7) {
-      // Para números de 9 dígitos
       if (cleaned.length === 11) {
         formatted = `(${cleaned.substring(0, 2)}) ${cleaned.substring(2, 7)}-${cleaned.substring(7, 11)}`;
       } else {

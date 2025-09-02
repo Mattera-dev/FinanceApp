@@ -10,8 +10,7 @@ interface AuthWrapperProps {
     children: React.ReactNode;
 }
 
-const unauthenticatedPaths = ['/auth', '/']; // Suas rotas públicas
-
+const unauthenticatedPaths = ['/auth', '/'];
 export default function AuthWrapper({ children }: AuthWrapperProps) {
     const { isLoading, isLogged, isLogout, checkAuth } = authStore();
     const router = useRouter();
@@ -24,7 +23,7 @@ export default function AuthWrapper({ children }: AuthWrapperProps) {
     const isAuthPath = unauthenticatedPaths.includes(pathname);
 
     if (isLoading) {
-        return <LoadingPage message='Carregando dados do usuario...' />;
+        return <LoadingPage message='Carregando dados...' />;
     }
 
     if (!isLogged && !isAuthPath && !isLogout) {
@@ -32,6 +31,5 @@ export default function AuthWrapper({ children }: AuthWrapperProps) {
         return null;
     }
 
-    // Renderiza o conteúdo da página quando o estado estiver pronto
     return <>{children}</>;
 }

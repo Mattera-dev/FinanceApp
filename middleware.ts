@@ -16,7 +16,6 @@ export async function middleware(request: NextRequest) {
 
         const token = request.cookies.get('auth_token')?.value;
         if (!token) {
-            console.log("nao tinha token volto pro auth")
             const loginUrl = new URL('/auth', request.url);
             return NextResponse.redirect(loginUrl);
         }
@@ -26,7 +25,6 @@ export async function middleware(request: NextRequest) {
 
             return NextResponse.next();
         } catch (error) {
-            console.log("deu erro e volto pro auth " + error);
 
             const loginUrl = new URL('/auth', request.url);
             return NextResponse.redirect(loginUrl);

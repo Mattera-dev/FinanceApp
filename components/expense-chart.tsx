@@ -7,18 +7,17 @@ import { Doughnut } from "react-chartjs-2"
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
-// Array fixo de cores para as categorias
 const fixedColors = [
-  "#3b82f6", // blue-500
-  "#ef4444", // red-500
-  "#8b5cf6", // violet-500
-  "#f97316", // orange-500
-  "#10b981", // emerald-500
-  "#64748b", // slate-500
-  "#eab308", // yellow-500
-  "#d946ef", // fuchsia-500
-  "#14b8a6", // teal-500
-  "#f43f5e", // rose-500
+  "#3b82f6",
+  "#ef4444",
+  "#8b5cf6",
+  "#f97316",
+  "#10b981",
+  "#64748b",
+  "#eab308",
+  "#d946ef",
+  "#14b8a6",
+  "#f43f5e",
 ]
 
 const processChartData = (transactions: ITransaction[]) => {

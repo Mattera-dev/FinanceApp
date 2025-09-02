@@ -15,7 +15,6 @@ import { useTransactionsStore } from "@/app/stores/transactionStore"
 import type { ITransaction, ICreateTransactionBody, IUpdateTransactionBody } from "@/types/transactions"
 
 export default function TransactionsPage() {
-  const router = useRouter()
   const { transactions, fetchTransactions, loading, addTransaction, updateTransaction } = useTransactionsStore();
 
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -24,7 +23,6 @@ export default function TransactionsPage() {
   const [editingTransaction, setEditingTransaction] = useState<ITransaction | null>(null)
 
   useEffect(() => {
-    // Carrega as transações apenas uma vez ao montar o componente
     fetchTransactions()
   }, [fetchTransactions])
 
@@ -83,13 +81,12 @@ export default function TransactionsPage() {
           )}
         </div>
       </main>
-      
+
       <TransactionModal
         isOpen={isModalOpen}
         onClose={handleModalClose}
         onSubmit={handleTransactionSubmit}
-        initialData={editingTransaction || undefined} // Pass the editing data here
-      />
+        initialData={editingTransaction || undefined} />
       <WhatsAppModal isOpen={isWhatsAppModalOpen} onClose={() => setIsWhatsAppModalOpen(false)} />
       <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} />
     </PageLayout>

@@ -36,7 +36,6 @@ export function DashboardPreview() {
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 backdrop-blur-sm rounded-lg" />
 
       <div className="relative p-2 md:p-6 space-y-6">
-        {/* Summary Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
           <Card ref={totalBalance.ref} className={`bg-background/80 backdrop-blur-sm border-primary/20 delay-[500ms] transition-all duration-200
                   ${totalBalance.isIntersecting ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-12"}`}>
@@ -87,7 +86,6 @@ export function DashboardPreview() {
           </Card>
         </div>
 
-        {/* Expense Categories */}
         <Card className="bg-background/80 backdrop-blur-sm">
           <CardHeader>
             <CardTitle>Gastos por Categoria</CardTitle>

@@ -42,7 +42,6 @@ export function TransactionList({ onEditTransaction }: TransactionListProps) {
     return matchesSearch && matchesType && matchesCategory
   })
 
-  // Group transactions by month and year
   const groupedTransactions = filteredTransactions.reduce((acc, transaction) => {
     const date = new Date(transaction.date);
     const monthYear = format(date, "MMMM 'de' yyyy", { locale: ptBR });
@@ -55,17 +54,14 @@ export function TransactionList({ onEditTransaction }: TransactionListProps) {
 
   const categories = Array.from(new Set(transactions.map((t) => t.category)))
 
-  // Define a type for the month names
   type MonthName = "janeiro" | "fevereiro" | "março" | "abril" | "maio" | "junho" | "julho" | "agosto" | "setembro" | "outubro" | "novembro" | "dezembro";
 
-  // Use the new type for the monthMap
   const monthMap: Record<MonthName, number> = {
     "janeiro": 0, "fevereiro": 1, "março": 2, "abril": 3,
     "maio": 4, "junho": 5, "julho": 6, "agosto": 7,
     "setembro": 8, "outubro": 9, "novembro": 10, "dezembro": 11
   };
 
-  // Your sorting function remains the same, but now it's type-safe
   const sortedMonths = Object.keys(groupedTransactions).sort((a, b) => {
     const [monthNameA, yearA] = a.toLowerCase().split(" de ") as [MonthName, string];
     const [monthNameB, yearB] = b.toLowerCase().split(" de ") as [MonthName, string];
@@ -92,7 +88,6 @@ export function TransactionList({ onEditTransaction }: TransactionListProps) {
 
   return (
     <div className="space-y-6">
-      {/* Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="p-4">
@@ -135,7 +130,6 @@ export function TransactionList({ onEditTransaction }: TransactionListProps) {
         </Card>
       </div>
 
-      {/* Filters */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -192,7 +186,6 @@ export function TransactionList({ onEditTransaction }: TransactionListProps) {
         </CardContent>
       </Card>
 
-      {/* Transactions List */}
       <Card>
         <CardHeader>
           <CardTitle>Transações ({filteredTransactions.length})</CardTitle>

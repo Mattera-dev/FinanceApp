@@ -2,7 +2,7 @@ import { IUserId } from "@/types/user";
 import { verify } from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
 
-const JWT_KEY = process.env.JWT_KEY || ""
+const JWT_KEY = process.env.JWT_KEY as string
 
 export async function GET(req: NextRequest) {
 

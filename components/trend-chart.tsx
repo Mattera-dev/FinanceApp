@@ -17,12 +17,10 @@ import { ITransaction } from "@/types/transactions"
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
-// Função para processar os dados para o formato do gráfico
 const processChartData = (transactions: ITransaction[]) => {
   const now = new Date();
   const months = ['jan.', 'fev.', 'mar.', 'abr.', 'mai.', 'jun.', 'jul.', 'ago.', 'set.', 'out.', 'nov.', 'dez.'];
 
-  // Cria os rótulos dinâmicos dos últimos 6 meses, contando com o mês atual
   const labels: string[] = [];
   const monthlyData: Record<string, { income: number, expenses: number }> = {};
   for (let i = 5; i >= 0; i--) {
@@ -32,12 +30,10 @@ const processChartData = (transactions: ITransaction[]) => {
     monthlyData[label] = { income: 0, expenses: 0 };
   }
 
-  // Mapeia as transações para os meses corretos
   transactions.forEach(t => {
     const transactionDate = new Date(t.date);
     const monthLabel = `${months[transactionDate.getMonth()]}`;
 
-    // Certifique-se de que estamos atualizando apenas os meses que fazem parte do gráfico
     if (monthlyData[monthLabel]) {
       if (t.type === 'income') {
         monthlyData[monthLabel].income += (t.amount / 100);
@@ -55,12 +51,7 @@ const processChartData = (transactions: ITransaction[]) => {
 };
 
 export function TrendChart() {
-  const { transactions, loading, fetchLastSixMonthsTransactions } = useTransactionsStore();
-
-  useEffect(() => {
-    // Busca as transações dos últimos 6 meses
-    fetchLastSixMonthsTransactions();
-  }, [fetchLastSixMonthsTransactions]);
+  const { transactions, loading } = useTransactionsStore();
 
   if (loading) {
     return (

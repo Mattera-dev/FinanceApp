@@ -66,10 +66,8 @@ export default function DashboardPage() {
   return (
     <PageLayout onOpenWhatsApp={() => setIsWhatsAppModalOpen(true)} onOpenSettings={() => setIsSettingsModalOpen(true)}>
       <main className="p-6 space-y-6">
-        {/* Summary Cards */}
         <SummaryCards />
 
-        {/* Action Buttons */}
         <div className="flex flex-col md:flex-row md:justify-between items-center gap-3">
           <div className="flex gap-2 w-full md:w-auto">
             <Button variant="outline" onClick={() => router.push("/")} className="gap-2 w-full md:w-auto">
@@ -91,7 +89,6 @@ export default function DashboardPage() {
         </div>
 
 
-        {/* Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {hasExpense ? (
             <ExpenseChart />
@@ -109,7 +106,6 @@ export default function DashboardPage() {
           <TrendChart />
         </div>
 
-        {/* Recent Transactions Preview */}
         <div className="bg-card rounded-lg border border-border p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Transações Recentes</h2>

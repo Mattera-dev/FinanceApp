@@ -12,8 +12,7 @@ export function useIntersectionObserver(options: UseIntersectionObserverOptions 
   const { threshold = 0.6, rootMargin = "0px", triggerOnce = true } = options
   const [isIntersecting, setIsIntersecting] = useState(false)
   const [hasTriggered, setHasTriggered] = useState(false)
-  const [element, setElement] = useState<HTMLDivElement | null>(null) // Usamos estado para o elemento
-
+  const [element, setElement] = useState<HTMLDivElement | null>(null)
   useEffect(() => {
     if (!element) return
 

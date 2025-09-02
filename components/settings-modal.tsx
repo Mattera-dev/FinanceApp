@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
 import { SettingsIcon, UserIcon, BellIcon, ShieldIcon, LogOutIcon, Moon, Sun } from "lucide-react"
-import { clearAuthCookie } from "@/lib/auth"
 import { useRouter } from "next/navigation"
 import { authStore } from "@/app/stores/authStore"
 
@@ -65,9 +64,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
         </DialogHeader>
 
         <div className="grid md:grid-cols-2 gap-8">
-          {/* Left Column */}
           <div className="space-y-6">
-            {/* Profile Section */}
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <UserIcon className="h-4 w-4" />
@@ -85,7 +82,6 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
             <Separator />
 
-            {/* Preferences Section */}
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <BellIcon className="h-4 w-4" />
@@ -113,9 +109,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             </div>
           </div>
 
-          {/* Right Column */}
           <div className="space-y-6">
-            {/* Security Section */}
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <ShieldIcon className="h-4 w-4" />
@@ -131,7 +125,6 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
             <Separator />
 
-            {/* Data Management */}
             <div className="space-y-3">
               <h3 className="font-medium">Dados</h3>
               <Button variant="outline" className="w-full justify-start bg-transparent">
@@ -147,7 +140,6 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
             <Separator />
 
-            {/* Actions */}
             <div className="space-y-2">
               <Button onClick={() => { }} className="w-full">
                 Salvar Alterações

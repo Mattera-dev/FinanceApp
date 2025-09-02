@@ -62,10 +62,7 @@ export default function InvestmentDashboard() {
   const handleSearch = async () => {
     if (!searchTicker) return;
 
-    // Lógica de validação melhorada para diferenciar tickers de ações e criptos.
-    // Tickers de ações no Brasil geralmente terminam com um número.
     const isBrazilianStock = /[0-9]$/.test(searchTicker);
-    // Tickers de criptomoedas são geralmente curtos e compostos apenas por letras.
     const isCrypto = searchTicker.length <= 5 && /^[A-Z]+$/.test(searchTicker);
 
     if (selectedInvestment === "acoes" && !isBrazilianStock) {
@@ -79,10 +76,8 @@ export default function InvestmentDashboard() {
     }
 
 
-    // Verificar se o ticker já está na lista
     const existingTickerIndex = tickerList.findIndex(item => item.symbol === searchTicker);
     if (existingTickerIndex !== -1) {
-      // Se existir, reordenar a lista para colocar o ticker no topo
       const existingTicker = tickerList[existingTickerIndex];
       const newTickerList = [
         existingTicker,
@@ -138,6 +133,7 @@ export default function InvestmentDashboard() {
   useEffect(() => {
     if (selectedInvestment) {
       fetchPredefinedTickers(selectedInvestment);
+      setSearchTicker("")
     }
   }, [selectedInvestment]);
 

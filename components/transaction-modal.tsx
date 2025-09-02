@@ -30,16 +30,15 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { expenseCategories, incomeCategories } from "@/lib/sample-data";
 import {
-  ICreateTransactionBody, ITransaction
+  ICreateTransactionBody, ITransaction, expenseCategories, incomeCategories
 } from "@/types/transactions";
 
 interface TransactionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: ICreateTransactionBody, id?: string) => Promise<void>; // Updated to accept ID
-  initialData?: ITransaction | null; // Added initialData prop
+  onSubmit: (data: ICreateTransactionBody, id?: string) => Promise<void>;
+  initialData?: ITransaction | null;
 }
 
 export function TransactionModal({ isOpen, onClose, onSubmit, initialData }: TransactionModalProps) {
@@ -54,18 +53,16 @@ export function TransactionModal({ isOpen, onClose, onSubmit, initialData }: Tra
     date: new Date(),
   });
 
-  // Populate form with initialData when modal opens in edit mode
   useEffect(() => {
     if (isOpen && initialData) {
       setFormData({
         type: (initialData.type as "income" | "expense") || "expense",
-        amount: (initialData.amount / 100).toString(), // Convert back to BRL
+        amount: (initialData.amount / 100).toString(),
         category: initialData.category,
         description: initialData.title,
         date: new Date(initialData.date),
       });
     } else if (!isOpen) {
-      // Reset form when modal is closed
       setFormData({
         type: "expense",
         amount: "",
@@ -106,7 +103,7 @@ export function TransactionModal({ isOpen, onClose, onSubmit, initialData }: Tra
         date: formData.date,
       };
 
-      await onSubmit(transaction, initialData?.id); // Pass ID if it exists
+      await onSubmit(transaction, initialData?.id);
 
     } catch (error) {
       setErrors({ general: "Erro ao salvar transação. Tente novamente." });
@@ -128,7 +125,7 @@ export function TransactionModal({ isOpen, onClose, onSubmit, initialData }: Tra
         <DialogHeader>
           <DialogTitle>{isEditing ? "Editar Transação" : "Nova Transação"}</DialogTitle>
           <DialogDescription>
-            {isEditing 
+            {isEditing
               ? "Modifique os detalhes da transação selecionada."
               : "Preencha os detalhes para adicionar uma nova transação."
             }
@@ -136,7 +133,6 @@ export function TransactionModal({ isOpen, onClose, onSubmit, initialData }: Tra
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Transaction Type Buttons */}
           <div className="space-y-2">
             <Label>Tipo de Transação</Label>
             <div className="flex gap-2">
@@ -160,7 +156,6 @@ export function TransactionModal({ isOpen, onClose, onSubmit, initialData }: Tra
             {errors.type && <p className="text-sm text-destructive">{errors.type}</p>}
           </div>
 
-          {/* Amount Field */}
           <div className="space-y-2">
             <Label htmlFor="amount">Valor (R$)</Label>
             <Input
@@ -175,7 +170,6 @@ export function TransactionModal({ isOpen, onClose, onSubmit, initialData }: Tra
             {errors.amount && <p className="text-sm text-destructive">{errors.amount}</p>}
           </div>
 
-          {/* Category Select */}
           <div className="space-y-2">
             <Label htmlFor="category">Categoria</Label>
             <Select
@@ -196,7 +190,6 @@ export function TransactionModal({ isOpen, onClose, onSubmit, initialData }: Tra
             {errors.category && <p className="text-sm text-destructive">{errors.category}</p>}
           </div>
 
-          {/* Date Picker */}
           <div className="space-y-2">
             <Label>Data</Label>
             <Popover>
@@ -232,7 +225,6 @@ export function TransactionModal({ isOpen, onClose, onSubmit, initialData }: Tra
             {errors.date && <p className="text-sm text-destructive">{errors.date}</p>}
           </div>
 
-          {/* Description Field */}
           <div className="space-y-2">
             <Label htmlFor="description">Descrição</Label>
             <Textarea

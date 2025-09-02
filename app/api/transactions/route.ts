@@ -10,13 +10,11 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url);
-    const filter = searchParams.get('filter'); // Ex: '?filter=monthly'
-
+    const filter = searchParams.get('filter');
     try {
         let transactions;
 
         if (filter === 'monthly') {
-            // Busca apenas as transações do mês no banco de dados
             transactions = await getTransactionsByMonth(userData.id);
         } else if (filter === "6-last-month") {
             transactions = await getTransactionsLastSixMonths(userData.id)
@@ -69,7 +67,6 @@ export async function PUT(req: NextRequest) {
         }
 
         delete updatedData.id
-        // Garanta que o usuário só possa alterar suas próprias transações
         const updatedTransaction = await updateTransaction(id, userData.id, updatedData);
 
         if (!updatedTransaction) {

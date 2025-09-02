@@ -1,4 +1,3 @@
-// pages/api/auth/google/callback.js
 import { NextRequest, NextResponse } from "next/server";
 import { OAuth2Client } from "google-auth-library";
 import { createJWT } from "@/lib/utils";
@@ -22,17 +21,14 @@ export async function GET(req: NextRequest) {
         const { tokens } = await oauth2Client.getToken(code);
         oauth2Client.setCredentials(tokens);
 
-        // Usa os tokens para obter as informações do usuário do Google
         const userInfoResponse = await oauth2Client.request({
             url: 'https://www.googleapis.com/oauth2/v2/userinfo',
         });
 
         const { email, name } = userInfoResponse.data as { email: string, name: string };
 
-        // 1. Verifique se o usuário já existe no seu banco de dados
         let user = await getUser({ email });
 
-        // 2. Se não existir, crie um novo
         if (!user) {
             user = await createUser({
                 email,
@@ -43,14 +39,12 @@ export async function GET(req: NextRequest) {
         }
 
 
-        // 3. Crie seu próprio token JWT, exatamente como você já faz
         const token = createJWT({
             email: user.email,
             name: user.name,
             id: user.id
         });
 
-        // 4. Crie e configure a resposta com o cookie
         const res = NextResponse.redirect(new URL("/dashboard", req.url));
 
 

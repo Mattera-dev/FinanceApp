@@ -19,7 +19,7 @@ export default function AuthPage() {
     if (error == "failed") {
       toast.error("Ocorreu um erro, tente novamente!")
     }
-    // Check URL params for mode
+    
     const urlMode = searchParams.get("mode")
     if (urlMode === "register") {
       setMode("register")

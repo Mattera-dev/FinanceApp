@@ -65,13 +65,11 @@ export async function GET(req: NextRequest) {
             where: { symbol: ticker.toUpperCase() }
         });
         if (cachedData && new Date(cachedData.lastUpdated) > yesterday) {
-            console.log(`Dados de ${ticker} retornados do cache.`);
             return NextResponse.json(cachedData, { status: 200 });
         }
         let relevantData = null;
         relevantData = await fetchBrapiData(ticker);
         if (!relevantData) {
-            console.log(`Falha com Brapi. Tentando Alpha Vantage para ${ticker}...`);
             relevantData = await fetchAlphaVantageData(ticker);
         }
         if (relevantData) {
@@ -80,10 +78,8 @@ export async function GET(req: NextRequest) {
                 update: { ...relevantData, lastUpdated: new Date() },
                 create: { ...relevantData, lastUpdated: new Date() }
             });
-            console.log(`Dados de ${ticker} salvos/atualizados no banco de dados.`);
             return NextResponse.json(relevantData, { status: 200 });
         } else {
-            console.log("nao achou nada!")
             return NextResponse.json({ error: `Dados para o ticker ${ticker} não disponíveis em nenhuma API.` }, { status: 404 });
         }
     } catch (err) {

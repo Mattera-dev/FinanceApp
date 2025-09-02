@@ -12,7 +12,6 @@ import {
   SettingsIcon,
   MessageCircleIcon,
 } from "lucide-react"
-import { removeAuthCookie, getAuthCookie } from "@/lib/auth"
 import { useEffect, useState } from "react"
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { authStore } from "@/app/stores/authStore"
@@ -48,7 +47,6 @@ export function Navigation({ onOpenWhatsApp, onOpenSettings }: NavigationProps) 
   const { user, logout } = authStore()
 
   useEffect(() => {
-    console.log(user)
     setUserName(user?.name ?? "<Erro>")
   }, [user])
 
@@ -138,12 +136,10 @@ export function Navigation({ onOpenWhatsApp, onOpenSettings }: NavigationProps) 
 
   return (
     <>
-      {/* Desktop Sidebar */}
       <div className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 lg:bg-card lg:border-r lg:border-border">
         <NavigationContent />
       </div>
 
-      {/* Mobile Navigation */}
       <div className="lg:hidden">
         <div className="flex items-center justify-between p-4 bg-card border-b border-border">
           <div>

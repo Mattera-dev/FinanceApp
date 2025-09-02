@@ -28,3 +28,25 @@ export interface IUpdateTransactionBody {
     type?: TransactionType;
     date?: Date;
 }
+
+export const expenseCategories = [
+    "Alimentação",
+    "Transporte",
+    "Moradia",
+    "Lazer",
+    "Saúde",
+    "Educação",
+    "Roupas",
+    "Outros",
+]
+
+export const incomeCategories = ["Salário", "Freelance", "Investimentos", "Vendas", "Outros"]
+
+export interface Transaction {
+    id: string
+    type: "income" | "expense"
+    amount: number
+    category: string
+    description: string
+    date: string
+}

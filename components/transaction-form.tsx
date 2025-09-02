@@ -12,8 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { expenseCategories, incomeCategories, type Transaction } from "@/lib/sample-data"
 import { ArrowLeftIcon } from "lucide-react"
+import { Transaction, expenseCategories, incomeCategories } from "@/types/transactions"
 
 interface TransactionFormProps {
   onSubmit: (transaction: Omit<Transaction, "id">) => void
@@ -107,7 +107,6 @@ export function TransactionForm({ onSubmit, initialData }: TransactionFormProps)
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Transaction Type */}
               <div className="space-y-3">
                 <Label>Tipo de Transação</Label>
                 <RadioGroup
@@ -133,7 +132,6 @@ export function TransactionForm({ onSubmit, initialData }: TransactionFormProps)
                 {errors.type && <p className="text-sm text-destructive">{errors.type}</p>}
               </div>
 
-              {/* Amount */}
               <div className="space-y-2">
                 <Label htmlFor="amount">Valor (R$)</Label>
                 <Input
@@ -148,7 +146,6 @@ export function TransactionForm({ onSubmit, initialData }: TransactionFormProps)
                 {errors.amount && <p className="text-sm text-destructive">{errors.amount}</p>}
               </div>
 
-              {/* Category */}
               <div className="space-y-2">
                 <Label htmlFor="category">Categoria</Label>
                 <Select
@@ -169,7 +166,6 @@ export function TransactionForm({ onSubmit, initialData }: TransactionFormProps)
                 {errors.category && <p className="text-sm text-destructive">{errors.category}</p>}
               </div>
 
-              {/* Date */}
               <div className="space-y-2">
                 <Label htmlFor="date">Data</Label>
                 <Input
@@ -182,7 +178,6 @@ export function TransactionForm({ onSubmit, initialData }: TransactionFormProps)
                 {errors.date && <p className="text-sm text-destructive">{errors.date}</p>}
               </div>
 
-              {/* Description */}
               <div className="space-y-2">
                 <Label htmlFor="description">Descrição</Label>
                 <Textarea

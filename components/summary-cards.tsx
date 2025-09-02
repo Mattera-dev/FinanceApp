@@ -5,14 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowUpIcon, ArrowDownIcon, DollarSignIcon, TrendingUpIcon } from "lucide-react"
 import { LoadingSpinner } from "./loading-spinner"
 import { useTransactionsStore } from "@/app/stores/transactionStore"
-import { useEffect, useState } from "react"
-
-interface SummaryCardsProps {
-  totalBalance: number
-  monthlyIncome: number
-  monthlyExpenses: number
-  savings: number
-}
 
 export function SummaryCards() {
   const formatCurrency = (value: number) => {

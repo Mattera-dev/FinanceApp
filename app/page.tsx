@@ -25,7 +25,7 @@ import { authStore } from "./stores/authStore"
 
 export default function HomePage() {
   const router = useRouter()
-  const { isLogged, login, logout } = authStore()
+  const { isLogged } = authStore()
 
   const delayClasses = "delay-[150ms] delay-[300ms] delay-[450ms] delay-[600ms] delay-[750ms] delay-[900ms] delay-[1050ms] delay-[1200ms]"
 
@@ -84,7 +84,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
@@ -109,7 +108,6 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Hero Section - No animation, always visible */}
       <section className="relative py-20 px-4 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent" />
@@ -148,7 +146,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features Section */}
       <section className="py-20 px-4 bg-muted/50">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
@@ -188,7 +185,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Demo Section */}
       <section id="demo-section" className="py-20 px-4 bg-muted/30">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
@@ -211,7 +207,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="py-20 px-4 relative overflow-hidden">
         <div
           ref={ctaContainer.ref}
@@ -233,7 +228,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Contact Section */}
       <section className="py-20 px-4 bg-muted/50">
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-16">
@@ -265,7 +259,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="border-t py-8 px-4 bg-card/50 backdrop-blur-sm">
         <div className="container mx-auto text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
