@@ -8,8 +8,6 @@ export async function createUser(userData: IUserRegisterRequest) {
         data: userData,
     })
 
-    if (!newUser) return false
-
     return newUser
 
 }
