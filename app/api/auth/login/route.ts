@@ -17,10 +17,11 @@ export async function POST(req: NextRequest) {
         const token = createJWT({
             email: user.email,
             name: user.name,
-            id: user.id
+            id: user.id,
+            phone: user.phone
         })
 
-        const res = NextResponse.json({ message: "Logged in!", user: { email: user.email, name: user.name, id: user.id, goal: user.goal } })
+        const res = NextResponse.json({ message: "Logged in!", user: { email: user.email, name: user.name, id: user.id, goal: user.goal, phone: user.phone } })
 
         res.cookies.set({
             name: 'auth_token',

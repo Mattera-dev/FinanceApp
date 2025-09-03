@@ -104,7 +104,8 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
       }
       const data = await res.json();
       const { user } = data;
-      login({ email: user.email, name: user.name }, user.goal);
+      console.log(user)
+      login({ email: user.email, name: user.name, phone: user.phone }, user.goal);
 
       setTimeout(() => {
         onSuccess();

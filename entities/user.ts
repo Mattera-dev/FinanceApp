@@ -1,6 +1,6 @@
 import { IUserRegisterRequest } from "@/types/requests";
 import prisma from "@/lib/prisma"
-import { IUserCredentials } from "@/types/user";
+import { IUser, IUserCredentials } from "@/types/user";
 
 
 export async function createUser(userData: IUserRegisterRequest) {
@@ -19,5 +19,20 @@ export async function getUser(userData: IUserCredentials) {
     })
     return user
 
+
+}
+
+export async function deleteUser(userData: IUser) {
+    try {
+
+        const user = await prisma.users.delete({
+            where: {
+                email: userData.email
+            }
+        })
+        return user
+    } catch (error) {
+        return null
+    }
 
 }

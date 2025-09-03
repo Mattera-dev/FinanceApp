@@ -42,6 +42,8 @@ export async function GET(req: NextRequest) {
         const token = createJWT({
             email: user.email,
             name: user.name,
+            google: true,
+            phone: user.phone,
             id: user.id
         });
 
