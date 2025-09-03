@@ -1,5 +1,3 @@
-// types/index.ts
-
 import { TransactionType } from "@/lib/generated/prisma";
 
 export interface ITransaction {

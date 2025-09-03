@@ -18,12 +18,11 @@ interface WhatsAppModalProps {
 
 type Step = "add-phone" | "confirm-phone" | "edit-phone" | "otp";
 
-// Função para formatar o número de telefone
 const formatPhoneNumber = (value: string) => {
   if (!value) return '';
 
   const cleaned = value.replace(/\D/g, '');
-  const limited = cleaned.substring(0, 11); // Limita a entrada a 11 dígitos
+  const limited = cleaned.substring(0, 11)
 
   if (limited.length === 11) {
     return limited.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
@@ -31,7 +30,6 @@ const formatPhoneNumber = (value: string) => {
     return limited.replace(/^(\d{2})(\d{4})(\d{4})$/, '($1) $2-$3');
   }
 
-  // Lógica para formatação enquanto o usuário digita
   if (limited.length > 2) {
     return `(${limited.substring(0, 2)}) ${limited.substring(2)}`;
   } else if (limited.length > 0) {
@@ -90,7 +88,6 @@ export function WhatsAppModal({ isOpen, onClose }: WhatsAppModalProps) {
     if (!otp.trim()) return;
 
     setIsLoading(true);
-    // Lógica para verificar o código OTP
     await new Promise((resolve) => setTimeout(resolve, 2000));
     setIsLoading(false);
 
