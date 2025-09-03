@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -22,10 +22,18 @@ import {
 } from "lucide-react"
 import PricingSection from "@/components/plans-section"
 import { authStore } from "./stores/authStore"
+import { toast } from "sonner"
 
 export default function HomePage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { isLogged } = authStore()
+
+  useEffect(() => {
+    if (searchParams.get("msg") == "deleted") {
+      toast.success("Sua conta foi deletada com sucesso!")
+    }
+  }, [])
 
   const delayClasses = "delay-[150ms] delay-[300ms] delay-[450ms] delay-[600ms] delay-[750ms] delay-[900ms] delay-[1050ms] delay-[1200ms]"
 

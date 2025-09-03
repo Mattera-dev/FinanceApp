@@ -11,6 +11,8 @@ import { SettingsIcon, UserIcon, BellIcon, ShieldIcon, LogOutIcon, Moon, Sun } f
 import { useRouter } from "next/navigation"
 import { authStore } from "@/app/stores/authStore"
 import { toast } from "sonner"
+import { DeleteUserModal } from "./deleteUser-modal"
+import { ChangePasswordModal } from "./changePass-modal"
 
 interface SettingsModalProps {
   isOpen: boolean
@@ -21,6 +23,8 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const router = useRouter()
   const [notifications, setNotifications] = useState(true)
   const [darkMode, setDarkMode] = useState(false)
+  const [deleteModal, setDeleteModal] = useState(false)
+  const [changePassModal, setchangePassModal] = useState(false)
   const { user, logout } = authStore()
 
 
@@ -105,7 +109,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     <p className="text-sm text-muted-foreground">Tema escuro da aplicação</p>
                   </div>
                 </div>
-                <Switch  className="border-[1px] border-blue-300" checked={darkMode} onCheckedChange={toggleDarkMode} />
+                <Switch className="border-[1px] border-blue-300" checked={darkMode} onCheckedChange={toggleDarkMode} />
               </div>
             </div>
           </div>
@@ -118,11 +122,11 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 <ShieldIcon className="h-4 w-4" />
                 <h3 className="font-medium">Segurança</h3>
               </div>
-              <Button variant="outline" className="w-full justify-start bg-transparent">
+              <Button variant="outline" onClick={() => setchangePassModal(true)} className="w-full justify-start bg-transparent">
                 Alterar Senha
               </Button>
-              <Button variant="outline" className="w-full justify-start bg-transparent">
-                Autenticação em Duas Etapas
+              <Button variant="destructive" onClick={() => setDeleteModal(true)} className="w-full justify-start">
+                Deletar conta
               </Button>
             </div>
 
@@ -138,6 +142,8 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           </div>
         </div>
       </DialogContent>
+      <ChangePasswordModal open={changePassModal} onClose={() => setchangePassModal(false)} />
+      <DeleteUserModal open={deleteModal} onClose={() => setDeleteModal(false)} />
     </Dialog>
   )
 }
