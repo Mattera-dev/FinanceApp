@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator"
 import { SettingsIcon, UserIcon, BellIcon, ShieldIcon, LogOutIcon, Moon, Sun } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { authStore } from "@/app/stores/authStore"
+import { toast } from "sonner"
 
 interface SettingsModalProps {
   isOpen: boolean
@@ -52,7 +53,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-4xl max-h-[90dvh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <SettingsIcon className="h-5 w-5" />
@@ -63,7 +64,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid gap-8">
           <div className="space-y-6">
             <div className="space-y-3">
               <div className="flex items-center gap-2">
@@ -93,7 +94,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   <Label>Notificações</Label>
                   <p className="text-sm text-muted-foreground">Receber alertas sobre gastos</p>
                 </div>
-                <Switch checked={notifications} onCheckedChange={setNotifications} />
+                <Switch className="border-[1px] border-blue-300" checked={notifications} onCheckedChange={setNotifications} />
               </div>
 
               <div className="flex items-center justify-between">
@@ -104,10 +105,12 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     <p className="text-sm text-muted-foreground">Tema escuro da aplicação</p>
                   </div>
                 </div>
-                <Switch checked={darkMode} onCheckedChange={toggleDarkMode} />
+                <Switch  className="border-[1px] border-blue-300" checked={darkMode} onCheckedChange={toggleDarkMode} />
               </div>
             </div>
           </div>
+
+          <Separator />
 
           <div className="space-y-6">
             <div className="space-y-3">
@@ -123,25 +126,8 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               </Button>
             </div>
 
-            <Separator />
-
-            <div className="space-y-3">
-              <h3 className="font-medium">Dados</h3>
-              <Button variant="outline" className="w-full justify-start bg-transparent">
-                Exportar Dados
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full justify-start bg-transparent text-destructive hover:text-destructive"
-              >
-                Limpar Todos os Dados
-              </Button>
-            </div>
-
-            <Separator />
-
             <div className="space-y-2">
-              <Button onClick={() => { }} className="w-full">
+              <Button onClick={() => { onClose(); toast.success("Salvo com sucesso!") }} className="w-full">
                 Salvar Alterações
               </Button>
               <Button variant="destructive" onClick={handleLogout} className="w-full justify-start gap-2">

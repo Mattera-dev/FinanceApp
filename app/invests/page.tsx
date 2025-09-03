@@ -12,6 +12,8 @@ import { LucideIcon } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { toast } from "sonner"
+import { WhatsAppModal } from "@/components/whatsapp-modal"
+import { SettingsModal } from "@/components/settings-modal"
 
 interface InvestmentOption {
   id: string
@@ -58,6 +60,8 @@ export default function InvestmentDashboard() {
   const [searchTicker, setSearchTicker] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [tickerList, setTickerList] = useState<StockData[]>([]);
+  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false)
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
 
   const handleSearch = async () => {
     if (!searchTicker) return;
@@ -201,12 +205,12 @@ export default function InvestmentDashboard() {
       <Card>
         <CardHeader>
           <CardTitle>Buscar Outro Ativo</CardTitle>
-          <CardDescription>Não encontrou o que procurava? Busque por um ticker específico.</CardDescription>
+          <CardDescription>Não encontrou o que procurava? Busque por um ticker { selectedInvestment == "acoes" ? "de acão" : "de criptomoeda"}  específico.</CardDescription>
         </CardHeader>
         <CardContent className="flex gap-4">
           <Input
             id="search-ticker"
-            placeholder="Ex: AMZN, BTC"
+            placeholder={selectedInvestment == "acoes" ? "Ex: PETR4" : "Ex: SOL"}
             value={searchTicker}
             onChange={(e) => setSearchTicker(e.target.value.toUpperCase())}
             onKeyPress={handleKeyPress}
@@ -263,7 +267,7 @@ export default function InvestmentDashboard() {
   );
 
   return (
-    <PageLayout>
+    <PageLayout onOpenWhatsApp={() => setIsWhatsAppModalOpen(true)} onOpenSettings={() => setIsSettingsModalOpen(true)}>
       <main className="container mx-auto px-4 py-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
@@ -275,6 +279,8 @@ export default function InvestmentDashboard() {
         </div>
         {selectedInvestment ? renderTickerList() : renderInvestmentSelection()}
       </main>
+      <WhatsAppModal isOpen={isWhatsAppModalOpen} onClose={() => setIsWhatsAppModalOpen(false)} />
+      <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} />
     </PageLayout>
   );
 }

@@ -58,7 +58,7 @@ export function ExpenseChart() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Gastos por Categoria</CardTitle>
+          <CardTitle>Gastos deste mês por Categoria</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-80 flex justify-center items-center">

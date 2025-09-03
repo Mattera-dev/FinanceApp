@@ -95,11 +95,11 @@ export default function DashboardPage() {
           ) : (
             <EmptyState
               icon={CreditCardIcon}
-              title="Nenhuma despesa registrada"
-              description="Comece adicionando suas primeiras transações para ver os gráficos de gastos por categoria."
+              title="Nenhuma despesa registrada neste mês"
+              description="Comece adicionando suas primeiras despesas deste mês para ver os gráficos de gastos por categoria."
               action={{
                 label: "Adicionar Transação",
-                onClick: () => handleOpenModal,
+                onClick: () => setIsModalOpen(true),
               }}
             />
           )}

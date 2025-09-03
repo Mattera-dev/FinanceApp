@@ -248,11 +248,11 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
             <>
               <div className="w-full flex gap-4 flex-col md:flex-row justify-between">
                 <a href="/api/auth/google" className="w-full md:w-auto">
-                  <Button type="button" variant={"destructive"} className="w-full md:w-auto">
+                  <Button type="button" variant="destructive" className="w-full md:w-auto">
                     <Chrome /> Entrar com o google
                   </Button>
                 </a>
-                <Button type="button" variant={"default"} className="">
+                <Button type="button" variant="default" disabled onClick={() => alert("Login com facebook nao implementado")}>
                   <Facebook /> Entrar com o facebook
                 </Button>
 
